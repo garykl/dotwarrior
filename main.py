@@ -4,34 +4,26 @@ from subprocess import Popen, PIPE
 import sys
 import textwrap
 
-
-
 # Typical command line usage:
 #
 # python graphdeps.py TASKFILTER
 #
-# TASKFILTER is a taskwarrior filter, documentation can be found here: http://taskwarrior.org/projects/taskwarrior/wiki/Feature_filters
-#
-# Probably the most helpful commands are:
-#
-# python graphdeps.py project:fooproject status:pending  
-#  --> graph pending tasks in project 'fooproject'
-#
-# python graphdeps.py project:fooproject
-#  --> graphs all tasks in 'fooproject', pending, completed, deleted
-#
-# python graphdeps.py status:pending
-#  --> graphs all pending tasks in all projects
-#
-# python graphdeps.py
-#  --> graphs everything - could be massive
-#
+# TASKFILTER is a taskwarrior filter, documentation can be found here:
+# http://taskwarrior.org/projects/taskwarrior/wiki/Feature_filters
+# setting up graphviz:
+# http://www.graphviz.org/doc/info/attrs.html
+# available colors
+# full list of colors here: http://www.graphviz.org/doc/info/colors.html
 
 
-#Wrap label text at this number of characters
+### basic configuration:
+
+# Wrap label text at this number of characters
 charsPerLine = 20;
+# The width of the border around the tasks:
+penWidth = 1
 
-#full list of colors here: http://www.graphviz.org/doc/info/colors.html
+# colors
 blockedColor = 'gold4'
 maxUrgencyColor = 'red2'
 unblockedColor = 'green'
@@ -40,139 +32,174 @@ waitColor = 'white'
 deletedColor = 'pink'
 tagColor = 'white'
 
-#The width of the border around the tasks:
-penWidth = 1
-
-#Left to right layout, my favorite, ganntt-ish
-HEADER = "digraph  dependencies { splines=true; overlap=ortho; rankdir=LR; weight=2;"
-
-#Spread tasks on page
-#HEADER = "digraph  dependencies { layout=neato;   splines=true; overlap=scalexy;  rankdir=LR; weight=2;"
-
-#More information on setting up graphviz: http://www.graphviz.org/doc/info/attrs.html
-
+## graphviz
+# Left to right layout, my favorite, ganntt-ish
+# HEADER = "digraph  dependencies { splines=true; overlap=ortho; rankdir=LR; weight=2;"
+# Spread tasks on page
+HEADER = "digraph  dependencies { layout=neato;   splines=true; overlap=scalexy;  rankdir=LR; weight=2;"
 FOOTER = "}"
-
-JSON_START = '['
-JSON_END = ']'
-
-validUuids = list()
 
 def call_taskwarrior(cmd):
     'call taskwarrior, returning output and error'
     tw = Popen(['task'] + cmd.split(), stdout=PIPE, stderr=PIPE)
     return tw.communicate()
 
+
 def get_json(query):
     'call taskwarrior, returning objects from json'
+    JSON_START = '['
+    JSON_END = ']'
     result, err = call_taskwarrior('export %s' % query)
     return json.loads(JSON_START + result + JSON_END)
 
+
 def call_dot(instruction):
     'call dot, returning stdout and stdout'
-    print(instruction)
     dot = Popen('circo -T png'.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
     return dot.communicate(instruction)
 
 
-query = sys.argv[1:]
-data = get_json(' '.join(query))
-#print data
-
-# fill in possible tags, they are going to be the center
-# of the network
-allTags = set()
-for datum in data:
-    if 'tags' in datum.keys():
-        for tag in datum['tags']:
-            if tag not in allTags:
-                allTags.add(tag)
-tags = {}
-for (tag, i) in zip(allTags, range(len(allTags))):
-    tags[tag] = i
-
-maxUrgency = -9999;
-for datum in data:
-    if float(datum['urgency']) > maxUrgency:
-        maxUrgency = float(datum['urgency'])
+def tagsFromData(data):
+    """
+    data is list of dictionaries, containing data from
+    the export function of taskwarrior.
+    return a set with the keys.
+    """
+    allTags = set()
+    for datum in data:
+        if 'tags' in datum.keys():
+            for tag in datum['tags']:
+                if tag not in allTags:
+                    allTags.add(tag)
+    return allTags
 
 
-### first pass: task nodes
-lines = [HEADER]
-for datum in data:
-    validUuids.append(datum['uuid'])
-    if datum['description']:
-
-        style = ''
-        color = ''
-        style = 'filled'
-
-        if datum['status']=='pending':
-            prefix = datum['id']
-            if not datum.get('depends','') : color = unblockedColor
-            else :
-                hasPendingDeps = 0
-                for depend in datum['depends'].split(','):
-                    for datum2 in data:
-                        if datum2['uuid'] == depend and datum2['status'] == 'pending':
-                            hasPendingDeps = 1
-                if hasPendingDeps == 1 : color = blockedColor
-                else : color = unblockedColor
-
-        elif datum['status'] == 'waiting':
-            prefix = 'WAIT'
-            color = waitColor
-        elif datum['status'] == 'completed':
-            prefix = 'DONE'
-            color = doneColor
-        elif datum['status'] == 'deleted':
-            prefix = 'DELETED'
-            color = deletedColor
-        else:
-            prefix = ''
-            color = 'white'
+def maximalUrgencyFromData(data):
+    maxUrgency = -9999;
+    for datum in data:
+        if float(datum['urgency']) > maxUrgency:
+            maxUrgency = float(datum['urgency'])
+    return maxUrgency
 
 
-        if float(datum['urgency']) == maxUrgency:
-            color = maxUrgencyColor
-
-        label = '';
-        descriptionLines = textwrap.wrap(datum['description'],charsPerLine);
-        for descLine in descriptionLines:
-            label += descLine+"\\n";
-
-        lines.append('"%s"[shape=note][penwidth=%d][label="%s\:%s"][fillcolor=%s][style=%s]' % (datum['uuid'], penWidth, prefix, label, color, style))
+def uuidsFromData(data):
+    res = []
+    for datum in data:
+        res.append(datum['uuid'])
+    return res
 
 
-### second pass: write down tags
-for tag in tags:
-    line = "\"tag{0}\"".format(tags[tag])
+def prepareTask(task):
+
+    style = ''
+    color = ''
+    style = 'filled'
+
+    if task['status']=='pending':
+        prefix = ''
+        if not task.get('depends',''):
+            color = unblockedColor
+        else :
+            hasPendingDeps = 0
+            for depend in task['depends'].split(','):
+                for task in data:
+                    if task['uuid'] == depend and task['status'] == 'pending':
+                        hasPendingDeps = 1
+            if hasPendingDeps == 1 : color = blockedColor
+            else : color = unblockedColor
+
+    elif task['status'] == 'waiting':
+        prefix = 'WAIT'
+        color = waitColor
+    elif task['status'] == 'completed':
+        prefix = 'DONE'
+        color = doneColor
+    elif task['status'] == 'deleted':
+        prefix = 'DELETED'
+        color = deletedColor
+    else:
+        prefix = ''
+        color = 'white'
+
+
+    if float(task['urgency']) == maxUrgency:
+        color = maxUrgencyColor
+
+    label = '';
+    descriptionLines = textwrap.wrap(task['description'],charsPerLine);
+    for descLine in descriptionLines:
+        label += descLine+"\\n";
+
+    line = '"{0}"'.format(task['uuid'])
+    line += '[shape=note]'
+    line += '[penwidth={0}]'.format(penWidth)
+    line += '[label="{0}: {1}"]'.format(prefix, label)
+    line += '[fillcolor={0}]'.format(color)
+    line += '[style={0}]'.format(style)
+
+    return line
+
+
+
+def tag2dot(tag):
+    line = "\"{0}\"".format(tag)
     line += "[shape=ellipse]"
     line += "[label=\"{0}\"]".format(tag)
     line += "[fillcolor=black]"
     line += "[style=filled]"
     line += "[fontcolor=white]"
-    lines.append(line)
+    return line
 
 
-### third pass: task dependencies
+def tags2dot(tags):
+    lines = []
+    for tag in tags:
+        lines.append(tag2dot(tag))
+    return lines
+
+
+def taskVStask2dot(task):
+    res = []
+    if task['description']:
+        for dep in task.get('depends', '').split(','):
+            if dep != '' and dep in uuids:
+                res.append('"%s" -> "%s"[style=bold];' % (dep, task['uuid']))
+    return res
+
+
+def taskVStag2dot(task):
+    res = []
+    if task['description']:
+        if 'tags' in task.keys():
+            for tag in task['tags']:
+                if tag in tags:
+                    line = "\"{0}\" -> \"{1}\"[style=dashed];".format(tag, task['uuid'])
+                    res.append(line)
+    return res
+
+
+query = sys.argv[1:]
+data = get_json(' '.join(query))
+
+# data has to be queried somehow
+
+tags = tagsFromData(data)
+maxUrgency = maximalUrgencyFromData(data)
+uuids = uuidsFromData(data)
+
+lines = [HEADER]
+
+# nodes
 for datum in data:
-    if datum['description']:
-        for dep in datum.get('depends', '').split(','):
-            #print ("\naaa %s" %dep)
-            if dep!='' and dep in validUuids:
-                lines.append('"%s" -> "%s"[style=bold];' % (dep, datum['uuid']))
-                continue
+    lines.append(prepareTask(datum))
+lines = lines + tags2dot(tags)
 
-
-### fourth pass: tag dependencies
+# edges
 for datum in data:
-    if 'tags' in datum.keys():
-        for tag in datum['tags']:
-            if tag in tags.keys():
-                line = "\"tag{0}\" -> \"{1}\"[style=dashed];".format(tags[tag], datum['uuid'])
-                lines.append(line)
+    lines = lines + taskVStask2dot(datum)
 
+for datum in data:
+    lines = lines + taskVStag2dot(datum)
 
 lines.append(FOOTER)
 
