@@ -25,7 +25,6 @@ penWidth = 1
 
 # colors
 blockedColor = 'gold4'
-maxUrgencyColor = 'red2'
 unblockedColor = 'green'
 doneColor = 'grey'
 waitColor = 'white'
@@ -36,7 +35,7 @@ tagColor = 'white'
 # Left to right layout, my favorite, ganntt-ish
 # HEADER = "digraph  dependencies { splines=true; overlap=ortho; rankdir=LR; weight=2;"
 # Spread tasks on page
-HEADER = "digraph  dependencies { layout=neato;   splines=true; overlap=scalexy;  rankdir=LR; weight=2;"
+HEADER = "digraph  dependencies { layout=circo;   splines=true; overlap=scalexy;  rankdir=LR; weight=2;"
 FOOTER = "}"
 
 def call_taskwarrior(cmd):
@@ -55,7 +54,7 @@ def get_json(query):
 
 def call_dot(instruction):
     'call dot, returning stdout and stdout'
-    dot = Popen('circo -T png'.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    dot = Popen('dot -T png'.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
     return dot.communicate(instruction)
 
 
@@ -72,14 +71,6 @@ def tagsFromData(data):
                 if tag not in allTags:
                     allTags.add(tag)
     return allTags
-
-
-def maximalUrgencyFromData(data):
-    maxUrgency = -9999;
-    for datum in data:
-        if float(datum['urgency']) > maxUrgency:
-            maxUrgency = float(datum['urgency'])
-    return maxUrgency
 
 
 def uuidsFromData(data):
@@ -120,10 +111,6 @@ def prepareTask(task):
     else:
         prefix = ''
         color = 'white'
-
-
-    if float(task['urgency']) == maxUrgency:
-        color = maxUrgencyColor
 
     label = '';
     descriptionLines = textwrap.wrap(task['description'],charsPerLine);
@@ -184,7 +171,6 @@ data = get_json(' '.join(query))
 # data has to be queried somehow
 
 tags = tagsFromData(data)
-maxUrgency = maximalUrgencyFromData(data)
 uuids = uuidsFromData(data)
 
 lines = [HEADER]
