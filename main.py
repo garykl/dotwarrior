@@ -18,6 +18,14 @@ import textwrap
 
 ### basic configuration:
 
+## what is a node?
+tagsASnodes = True
+projectsASnodes = True
+
+## fine tune node existence and connection creation
+excludedTags = ['program'] # those nodes are supressed
+excludedTaggedTaskStatus = ['completed', 'deleted'] # connection between tags and those are supressed
+
 # Wrap label text at this number of characters
 charsPerLine = 20;
 # The width of the border around the tasks:
@@ -35,7 +43,7 @@ tagColor = 'white'
 # Left to right layout, my favorite, ganntt-ish
 # HEADER = "digraph  dependencies { splines=true; overlap=ortho; rankdir=LR; weight=2;"
 # Spread tasks on page
-HEADER = "digraph  dependencies { layout=circo;   splines=true; overlap=scalexy;  rankdir=LR; weight=2;"
+HEADER = "digraph  dependencies { layout=sfdp;   splines=true; overlap=scalexy;  rankdir=LR; weight=2;"
 FOOTER = "}"
 
 def call_taskwarrior(cmd):
@@ -54,8 +62,16 @@ def get_json(query):
 
 def call_dot(instruction):
     'call dot, returning stdout and stdout'
-    dot = Popen('dot -T png'.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    dot = Popen('dot -T svg'.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
     return dot.communicate(instruction)
+
+
+def projectsFromTasks(tasks):
+    res = set()
+    for task in tasks:
+        if 'project' in task.keys():
+            res.add(task['project'])
+    return res
 
 
 def tagsFromData(data):
@@ -127,6 +143,16 @@ def prepareTask(task):
     return line
 
 
+def project2dot(project):
+    line = "\"{0}\"".format(project)
+    line += "[shape=diamond]"
+    line += "[label=\"{0}\"]".format(project)
+    line += "[color=blue]"
+    line += "[style=bold]"
+    line += "[fontcolor=blue]"
+    line += "[fontsize=10]"
+    return line
+
 
 def tag2dot(tag):
     line = "\"{0}\"".format(tag)
@@ -138,11 +164,20 @@ def tag2dot(tag):
     return line
 
 
-def tags2dot(tags):
+def list2dot(ll, f):
+    " convert a list to dot-file lines using the function f "
     lines = []
-    for tag in tags:
-        lines.append(tag2dot(tag))
+    for l in ll:
+        lines.append(f(l))
     return lines
+
+
+def tags2dot(tags):
+    return list2dot(tags, tag2dot)
+
+
+def projects2dot(projects):
+    return list2dot(projects, project2dot)
 
 
 def taskVStask2dot(task):
@@ -159,18 +194,43 @@ def taskVStag2dot(task):
     if task['description']:
         if 'tags' in task.keys():
             for tag in task['tags']:
-                if tag in tags:
+                if tag in tags and task['status'] not in excludedTaggedTaskStatus:
                     line = "\"{0}\" -> \"{1}\"[style=dashed];".format(tag, task['uuid'])
                     res.append(line)
     return res
 
 
+def taskVSproject2dot(task):
+    res = []
+    if task['description']:
+        if 'project' in task.keys():
+            project = task['project']
+            line = "\"{0}\" -> \"{1}\"[style=bold][color=blue];".format(project, task['uuid'])
+            res.append(line)
+    return res
+
+
+def excludeElementsFrom(toExclude, ll):
+    """
+    toExclude and ll are lists of elements.
+    return a new list, containing all elements of ll,
+    which are not in toExclude.
+    """
+    res = []
+    for l in ll:
+        if not l in toExclude:
+            res.append(l)
+    return res
+
+
 query = sys.argv[1:]
 data = get_json(' '.join(query))
+print(call_taskwarrior(' '.join(query))[0])
 
 # data has to be queried somehow
 
-tags = tagsFromData(data)
+projects = projectsFromTasks(data)
+tags = excludeElementsFrom(excludedTags, tagsFromData(data))
 uuids = uuidsFromData(data)
 
 lines = [HEADER]
@@ -178,14 +238,23 @@ lines = [HEADER]
 # nodes
 for datum in data:
     lines.append(prepareTask(datum))
-lines = lines + tags2dot(tags)
+if projectsASnodes:
+    lines = lines + projects2dot(projects)
+if tagsASnodes:
+    lines = lines + tags2dot(tags)
 
 # edges
 for datum in data:
     lines = lines + taskVStask2dot(datum)
 
-for datum in data:
-    lines = lines + taskVStag2dot(datum)
+if tagsASnodes:
+    for datum in data:
+        lines = lines + taskVStag2dot(datum)
+
+if projectsASnodes:
+    for datum in data:
+        lines = lines + taskVSproject2dot(datum)
+
 
 lines.append(FOOTER)
 
@@ -194,8 +263,8 @@ if err != '':
     print ('Error calling dot:')
     print (err.strip())
 
-print ('Writing to deps.png')
-with open('deps.png', 'w') as f:
+print ('Writing to deps.svg')
+with open('deps.svg', 'w') as f:
     f.write(png)
 
 
