@@ -1,24 +1,94 @@
 import textwrap
 
+## helpers
+
+def connector(conf, collections, tasks):
+    """
+    generate data structure containing all data
+    that is necessary for feeding the connections
+    into the dot program.
+    """
+    class Ret(object): # a list of its instaces is returned
+        def __init__(self, id1, id2, style, color, weight):
+            self.id1 = id1
+            self.id2 = id2
+            self.style = style
+            self.color = color
+            self.weight = weight
+
+    def taskVStask(task, uuids):
+        res = []
+        if task['description']:
+            if 'depends' in task:
+                for dep in task['depends'].split(','):
+                    if dep in uuids:
+                        res.append(Ret(dep, task['uuid'], 'bold', 'black', conf.weights.task2task))
+        return res
+
+    def taskVStags(task, tags, excludedTaggedTaskStatus):
+        res = []
+        if task['description']:
+            if 'tags' in task.keys():
+                for tag in task['tags']:
+                    if tag in tags and not task['status'] in excludedTaggedTaskStatus:
+                        res.append(Ret(tag, task['uuid'], 'dashed', 'black', conf.weights.task2tag))
+        return res
+
+    def taskVSprojects(task, excludedTaskStatus):
+        res = []
+        if task['description']:
+            if 'project' in task.keys():
+                if not task['status'] in excludedTaskStatus:
+                    res.append(Ret(task['uuid'], task['project'], 'bold', 'blue', conf.weights.task2project))
+        return res
+
+    def taskVSannotations(task):
+        res = []
+        if task['status'] not in conf.excluded.annotationStatus:
+            if 'annotations' in task:
+                for a in task['annotations']:
+                    res.append(Ret(a['entry'],
+                                   task['uuid'],
+                                   'solid',
+                                   'green',
+                                   conf.weights.task2annotation))
+        return res
+
+    def projectVStags(task):
+        pass
+
+    res = []
+    for t in tasks:
+        if conf.nodes.tasks:
+            res = res + taskVStask(t, collections.uuids)
+        if conf.nodes.tags:
+            res = res + taskVStags(t, collections.tags, conf.excluded.taggedTaskStatus)
+        if conf.nodes.projects:
+            res = res + taskVSprojects(t, conf.excluded.taskStatus)
+        if conf.nodes.annotations:
+            res = res + taskVSannotations(t)
+    print(list(filter(lambda x: x != [], res)))
+    return res
+
+def tagVSproject(self):
+        pass
+
 
 class Dotter(object):
 
-    def __init__(self,
-                 layout,
-                 colors,
-                 weight,
-                 misc):
+    def __init__(self, conf, connects):
         self.HEADER = "digraph  dependencies {"
-        self.HEADER += "layout={0}; ".format(layout)
+        self.HEADER += "layout={0}; ".format(conf.layout)
         self.HEADER += "splines=true; "
         self.HEADER += "overlap=scalexy; "
         self.HEADER += "rankdir=LR;"
         self.HEADER += "weight=2;"
         self.FOOTER = "}"
-        self.layout = layout
-        self.misc = misc
-        self.colors = colors
-        self.weight = weight
+        self.connects = connects
+        self.layout = conf.layout
+        self.misc = conf.misc
+        self.colors = conf.colors
+        self.weights = conf.weights
 
 
     def project(self, project):
@@ -56,7 +126,6 @@ class Dotter(object):
         res += '[style=filled]'
         return res
 
-
     def tags(self, tags):
         return list(map(self.tag, tags))
 
@@ -67,61 +136,7 @@ class Dotter(object):
         h = [self.annotation(a) for a in annotations]
         return h
 
-    def taskVStask(self, task, uuids):
-        res = []
-        if task['description']:
-            for dep in task.get('depends', '').split(','):
-                if dep != '' and dep in uuids:
-                    line = '"{0}" -> "{0}"'.format(dep, task['uuid'])
-                    line += '[style=bold]'
-                    line += '[weight={0}]'.format(self.weight.task2task)
-                    res.append(line)
-        return res
-
-
-    def taskVStag(self, task, tags, excludedTaggedTaskStatus):
-        res = []
-        if task['description']:
-            if 'tags' in task.keys():
-                for tag in task['tags']:
-                    if tag in tags and not task['status'] in excludedTaggedTaskStatus:
-                        line = "\"{0}\" -> \"{1}\"".format(tag, task['uuid'])
-                        line += '[style=dashed]'
-                        line += '[weight={0}];'.format(self.weight.task2tag)
-                        res.append(line)
-        return res
-
-
-    def taskVSproject(self,task, excludedTaskStatus):
-        res = []
-        if task['description']:
-            if 'project' in task.keys():
-                if not task['status'] in excludedTaskStatus:
-                    project = task['project']
-                    line = "\"{0}\" -> \"{1}\"".format(project, task['uuid'])
-                    line += '[weight={0}]'.format(self.weight.task2project)
-                    line += '[style=bold][color=blue]';
-                    res.append(line)
-        return res
-
-
-    def taskVSannotation(self, task):
-        lines = []
-        if 'annotations' in task:
-            for a in task['annotations']:
-                line = '"{0}" -> "{1}"'.format(a['entry'], task['uuid'])
-                line += '[style=solid]'
-                line += '[color=green]'
-                line += '[weight={0}]'.format(self.weight.task2annotation)
-                lines.append(line)
-        return lines
-
-
-    def tagVSproject(self):
-        pass
-
-
-    def task(self, tasks, task, excludedTaskStatus):
+    def task(self, tasks, task, excludedTaskStatus, excludedAnnotationStatus):
 
         style = ''
         color = ''
@@ -132,16 +147,18 @@ class Dotter(object):
 
         if task['status'] == 'pending':
             prefix = ''
-            if not task.get('depends',''):
+            if not 'depends' in task:
                 color = self.colors.unblocked
             else :
-                hasPendingDeps = 0
+                hasPendingDeps = False
                 for depend in task['depends'].split(','):
-                    for task in tasks:
-                        if task['uuid'] == depend and task['status'] == 'pending':
-                            hasPendingDeps = 1
-                if hasPendingDeps == 1 : color = self.colors.blocked
-                else : color = self.colors.unblocked
+                    for t in tasks:
+                        if t['uuid'] == depend and not t['status'] in excludedAnnotationStatus:
+                            hasPendingDeps = True
+                if hasPendingDeps:
+                    color = self.colors.blocked
+                else:
+                    color = self.colors.unblocked
 
         elif task['status'] == 'waiting':
             prefix = 'WAIT'
@@ -172,35 +189,34 @@ class Dotter(object):
         return line
 
 
+    def nodesVSnodes(self, con):
+        line = '"{0}" -> "{1}"'.format(con.id1, con.id2)
+        line += '[style={0}]'.format(con.style)
+        line += '[color={0}]'.format(con.color)
+        line += '[weight={0}]'.format(con.weight)
+        return line
 
 
-    def inputString(self, tasks, collection,
-                    excludedTaskStatus, excludedTaggedTaskStatus,
-                    tagsASnodes, projectsASnodes, annotationsASnodes):
+
+    def inputString(self, tasks, collection, conf):
         res = [self.HEADER]
 
         # nodes
         for task in tasks:
-            res.append(self.task(tasks, task, excludedTaskStatus))
-        if projectsASnodes:
+            res.append(self.task(tasks,
+                                 task,
+                                 conf.excluded.taskStatus,
+                                 conf.excluded.annotationStatus))
+        if conf.nodes.projects:
             res = res + self.projects(collection.projects)
-        if tagsASnodes:
+        if conf.nodes.tags:
             res = res + self.tags(collection.tags)
-        if annotationsASnodes:
+        if conf.nodes.annotations:
             res = res + self.annotations(collection.annotations)
 
         # edges
-        for task in tasks:
-            res = res + self.taskVStask(task, collection.uuids)
-        if tagsASnodes:
-            for task in tasks:
-                res = res + self.taskVStag(task, collection.tags, excludedTaggedTaskStatus)
-        if projectsASnodes:
-            for task in tasks:
-                res = res + self.taskVSproject(task, excludedTaskStatus)
-        if annotationsASnodes:
-            for task in tasks:
-                res = res + self.taskVSannotation(task)
+        for con in self.connects:
+            res.append(self.nodesVSnodes(con))
 
         res.append(self.FOOTER)
 
