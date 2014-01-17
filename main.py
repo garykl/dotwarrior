@@ -2,7 +2,7 @@
 import sys
 
 from extern import dot, taskwarriorJSON
-from dotter import Dotter, connector
+from dotter import Dotter, connector, nodes
 from collector import Collector
 from config import Conf
 # Typical command line usage:
@@ -26,9 +26,12 @@ tasks = taskwarriorJSON(' '.join(query))
 
 # dotfile
 collections = Collector(tasks, conf.excluded.tags)
+
 connects = connector(conf, collections, tasks)
-dotter = Dotter(conf, connects)
-dotSource = dotter.inputString(tasks, collections, conf)
+nods = nodes(conf, collections, tasks)
+
+dotter = Dotter(conf)
+dotSource = dotter.inputString(nods, connects)
 
 #:print(dotSource)
 ## calling dot

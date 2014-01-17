@@ -6,11 +6,12 @@ layout = "neato"
 class Miscs(object):
     def __init__(self):
         self.charsPerLine = 20;
-        self.penWidth = 1
+        self.penwidth = 1
 
 # colors
 class Colors(object):
     def __init__(self):
+        self.project = 'white'
         self.annotation = 'yellow'
         self.blocked = 'green'
         self.unblocked = 'lightgreen'

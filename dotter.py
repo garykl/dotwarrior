@@ -67,16 +67,118 @@ def connector(conf, collections, tasks):
             res = res + taskVSprojects(t, conf.excluded.taskStatus)
         if conf.nodes.annotations:
             res = res + taskVSannotations(t)
-    print(list(filter(lambda x: x != [], res)))
     return res
 
 def tagVSproject(self):
         pass
 
+def nodes(conf, collections, tasks):
+    """
+    return all necessary information for nodes creation
+    by the dot program.
+    """
+    class Ret(object):
+        def __init__(self, id, label, **attrs):
+            self.id = id
+            self.label = label
+            self.shape = attrs.get('shape', 'box')
+            self.style = attrs.get('style', '')
+            self.fillcolor = attrs.get('fillcolor', 'white')
+            self.fontcolor = attrs.get('fontcolor', 'black')
+            self.fontsize = attrs.get('fontsize', '10')
+            self.color = attrs.get('color', 'black')
+            self.penwidth = attrs.get('penwidth', conf.misc.penwidth)
+
+    def project(p):
+         return Ret(p, p,
+                    shape='diamond',
+                    color='blue',
+                    style='bold',
+                    fontcolor='red',
+                    fontsize='12')
+
+    def tag(t):
+        return Ret(t, t,
+                   shape='ellipse',
+                   fillcolor=conf.colors.project,
+                   style='filled',
+                   fontcolor='white')
+
+    def annotation(a):
+        label = ''
+        descriptionLines = textwrap.wrap(a.description,
+                                         conf.misc.charsPerLine)
+        for descLine in descriptionLines:
+            label += descLine + "\\n";
+        return Ret(a.entry, label,
+                   shape='note',
+                   fillcolor=conf.colors.annotation,
+                   style='filled')
+
+    def task(t):
+        style = ''
+        color = ''
+        style = 'filled'
+
+        if t['status'] in conf.excluded.taskStatus:
+            return ''
+
+        if t['status'] == 'pending':
+            prefix = ''
+            if not 'depends' in t:
+                color = conf.colors.unblocked
+            else :
+                hasPendingDeps = False
+                for depend in t['depends'].split(','):
+                    for t2 in tasks:
+                        if t2['uuid'] == depend:
+                            if not t2['status'] in conf.excluded.annotationStatus:
+                                hasPendingDeps = True
+                if hasPendingDeps:
+                    color = conf.colors.blocked
+                else:
+                    color = conf.colors.unblocked
+
+        elif t['status'] == 'waiting':
+            prefix = 'WAIT'
+            color = conf.colors.wait
+        elif t['status'] == 'completed':
+            prefix = 'DONE'
+            color = conf.colors.done
+        elif t['status'] == 'deleted':
+            prefix = 'DELETED'
+            color = conf.colors.deleted
+        else:
+            prefix = ''
+            color = conf.colors.other
+
+        label = '';
+        descriptionLines = textwrap.wrap(t['description'],
+                                         conf.misc.charsPerLine);
+        for descLine in descriptionLines:
+            label += descLine + "\\n";
+
+        return Ret(t['uuid'], '{0}: {1}'.format(prefix, label),
+                   shape='box',
+                   fillcolor=color,
+                   style=style)
+
+    res = []
+    for t in tasks:
+        res.append(task(t))
+    if conf.nodes.projects:
+        res = res + list(map(project, collections.projects))
+    if conf.nodes.tags:
+        res = res + list(map(tag, collections.tags))
+    if conf.nodes.annotations:
+        res = res + list(map(annotation, collections.annotations))
+
+    return res
+
 
 class Dotter(object):
 
-    def __init__(self, conf, connects):
+    def __init__(self, conf):
         self.HEADER = "digraph  dependencies {"
         self.HEADER += "layout={0}; ".format(conf.layout)
         self.HEADER += "splines=true; "
@@ -84,112 +186,23 @@ class Dotter(object):
         self.HEADER += "rankdir=LR;"
         self.HEADER += "weight=2;"
         self.FOOTER = "}"
-        self.connects = connects
         self.layout = conf.layout
         self.misc = conf.misc
         self.colors = conf.colors
         self.weights = conf.weights
 
 
-    def project(self, project):
-        line = "\"{0}\"".format(project)
-        line += "[shape=diamond]"
-        line += "[label=\"{0}\"]".format(project)
-        line += "[color=blue]"
-        line += "[style=bold]"
-        line += "[fontcolor=red]"
-        line += "[fontsize=12]"
+    def node(self, n):
+        line = '"{0}"'.format(n.id)
+        line += '[label="{0}"]'.format(n.label)
+        line += '[shape={0}]'.format(n.shape)
+        line += '[fillcolor={0}]'.format(n.fillcolor)
+        line += '[style={0}]'.format(n.style)
+        line += '[penwidth={0}]'.format(n.penwidth)
         return line
 
 
-    def tag(self, tag):
-        line = "\"{0}\"".format(tag)
-        line += "[shape=ellipse]"
-        line += "[label=\"{0}\"]".format(tag)
-        line += "[fillcolor=black]"
-        line += "[style=filled]"
-        line += "[fontcolor=white]"
-        return line
-
-
-    def annotation(self, anno):
-        label = ''
-        descriptionLines = textwrap.wrap(anno.description,
-                                         self.misc.charsPerLine)
-        for descLine in descriptionLines:
-            label += descLine + "\\n";
-        res = '"{0}"'.format(anno.entry)
-        res += '[shape=note]'
-        res += '[penwidth={0}]'.format(self.misc.penWidth)
-        res += '[label="{0}"]'.format(label)
-        res += '[fillcolor={0}]'.format(self.colors.annotation)
-        res += '[style=filled]'
-        return res
-
-    def tags(self, tags):
-        return list(map(self.tag, tags))
-
-    def projects(self, projects):
-        return list(map(self.project, projects))
-
-    def annotations(self, annotations):
-        h = [self.annotation(a) for a in annotations]
-        return h
-
-    def task(self, tasks, task, excludedTaskStatus, excludedAnnotationStatus):
-
-        style = ''
-        color = ''
-        style = 'filled'
-
-        if task['status'] in excludedTaskStatus:
-            return ''
-
-        if task['status'] == 'pending':
-            prefix = ''
-            if not 'depends' in task:
-                color = self.colors.unblocked
-            else :
-                hasPendingDeps = False
-                for depend in task['depends'].split(','):
-                    for t in tasks:
-                        if t['uuid'] == depend and not t['status'] in excludedAnnotationStatus:
-                            hasPendingDeps = True
-                if hasPendingDeps:
-                    color = self.colors.blocked
-                else:
-                    color = self.colors.unblocked
-
-        elif task['status'] == 'waiting':
-            prefix = 'WAIT'
-            color = self.colors.wait
-        elif task['status'] == 'completed':
-            prefix = 'DONE'
-            color = self.colors.done
-        elif task['status'] == 'deleted':
-            prefix = 'DELETED'
-            color = self.colors.deleted
-        else:
-            prefix = ''
-            color = self.colors.other
-
-        label = '';
-        descriptionLines = textwrap.wrap(task['description'],
-                                         self.misc.charsPerLine);
-        for descLine in descriptionLines:
-            label += descLine + "\\n";
-
-        line = '"{0}"'.format(task['uuid'])
-        line += '[shape=box]'
-        line += '[penwidth={0}]'.format(self.misc.penWidth)
-        line += '[label="{0}: {1}"]'.format(prefix, label)
-        line += '[fillcolor={0}]'.format(color)
-        line += '[style={0}]'.format(style)
-
-        return line
-
-
-    def nodesVSnodes(self, con):
+    def nodeVSnode(self, con):
         line = '"{0}" -> "{1}"'.format(con.id1, con.id2)
         line += '[style={0}]'.format(con.style)
         line += '[color={0}]'.format(con.color)
@@ -198,25 +211,16 @@ class Dotter(object):
 
 
 
-    def inputString(self, tasks, collection, conf):
+    def inputString(self, nodes, connects):
         res = [self.HEADER]
 
         # nodes
-        for task in tasks:
-            res.append(self.task(tasks,
-                                 task,
-                                 conf.excluded.taskStatus,
-                                 conf.excluded.annotationStatus))
-        if conf.nodes.projects:
-            res = res + self.projects(collection.projects)
-        if conf.nodes.tags:
-            res = res + self.tags(collection.tags)
-        if conf.nodes.annotations:
-            res = res + self.annotations(collection.annotations)
+        for n in nodes:
+            res.append(self.node(n))
 
         # edges
-        for con in self.connects:
-            res.append(self.nodesVSnodes(con))
+        for con in connects:
+            res.append(self.nodeVSnode(con))
 
         res.append(self.FOOTER)
 
