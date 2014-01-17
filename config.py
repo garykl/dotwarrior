@@ -26,14 +26,14 @@ class Nodes(object):
     def __init__(self):
         self.tasks = True
         self.tags = True
-        self.projects = True
+        self.projects = False
         self.annotations = True
 
 ## fine tune node existence and connection creation
 class Excluded(object):
     def __init__(self):
         self.tags = ['program'] # those nodes are supressed
-        self.taggedTaskStatus = set(['completed', 'deleted']) # connection between tags and those are supressed
+        self.taggedTaskStatus = set(['deleted']) # connection between tags and those are supressed
         self.taskStatus = ['deleted'] # nodes removed
         self.annotationStatus = ['completed']
         for e in self.taskStatus:  # excluded tasks do not need connections

@@ -18,5 +18,12 @@ def taskwarriorJSON(query):
 def dot(instruction):
     'call dot, returning stdout and stdout'
     dot = Popen('dot -T svg'.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
-    return dot.communicate(instruction.encode())
+    (png, err) = dot.communicate(instruction.encode())
+    if err != b'':
+        print ('Error calling dot:')
+        print (err.strip())
+    else:
+        with open('deps.svg', 'w') as f:
+            f.write(png.decode('utf-8'))
+
 

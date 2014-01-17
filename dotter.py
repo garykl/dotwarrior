@@ -173,7 +173,7 @@ def nodes(conf, collections, tasks):
     if conf.nodes.annotations:
         res = res + list(map(annotation, collections.annotations))
 
-    return res
+    return filter(lambda x: x != '', res)
 
 
 class Dotter(object):
@@ -226,4 +226,8 @@ class Dotter(object):
 
         return "\n".join(res)
 
+
+def dotCode(conf, nodes, connects):
+    dotter = Dotter(conf)
+    return dotter.inputString(nodes, connects)
 

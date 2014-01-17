@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 
 from extern import dot, taskwarriorJSON
-from dotter import Dotter, connector, nodes
+from dotter import dotCode, connector, nodes
 from collector import Collector
 from config import Conf
 # Typical command line usage:
@@ -17,31 +17,21 @@ from config import Conf
 # full list of colors here: http://www.graphviz.org/doc/info/colors.html
 
 
-query = sys.argv[1:]
+query = ' '.join(sys.argv[1:])
+
+## read data
 conf = Conf()
+tasks = taskwarriorJSON(query)
 
-tasks = taskwarriorJSON(' '.join(query))
-
-# data has to be queried somehow
-
-# dotfile
+## prepare data
 collections = Collector(tasks, conf.excluded.tags)
 
 connects = connector(conf, collections, tasks)
 nods = nodes(conf, collections, tasks)
 
-dotter = Dotter(conf)
-dotSource = dotter.inputString(nods, connects)
+## write data
+dotSource = dotCode(conf, nods, connects)
 
-#:print(dotSource)
 ## calling dot
-png, err = dot(dotSource)
-if err != b'':
-    print ('Error calling dot:')
-    print (err.strip())
-
-print ('Writing to deps.svg')
-with open('deps.svg', 'w') as f:
-    f.write(png.decode('utf-8'))
-
+dot(dotSource)
 
