@@ -11,6 +11,12 @@ def excludeElementsFrom(toExclude, ll):
     return res
 
 
+class Annotation(object):
+    def __init__(self, entry, description):
+        self.entry = entry
+        self.description = description
+
+
 class Collector(object):
 
     def __init__(self, tasks, excludedTags):
@@ -18,6 +24,7 @@ class Collector(object):
         self.projects = self.projects()
         self.tags = excludeElementsFrom(excludedTags, self.tags())
         self.uuids = self.uuids()
+        self.annotations = self.annotations()
 
     def projects(self):
         res = set()
@@ -47,3 +54,10 @@ class Collector(object):
         return res
 
 
+    def annotations(self):
+        res = []
+        for task in self.tasks:
+            if 'annotations' in task:
+                for a in task['annotations']:
+                    res.append(Annotation(a['entry'], a['description']))
+        return res

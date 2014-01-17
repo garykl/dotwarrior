@@ -21,6 +21,7 @@ from collector import Collector
 ## what is a node?
 tagsASnodes = True
 projectsASnodes = True
+annotationsASnodes = True
 
 ## fine tune node existence and connection creation
 excludedTags = ['program'] # those nodes are supressed
@@ -32,9 +33,10 @@ for e in excludedTaskStatus:  # excluded tasks do not need connections
 ## edges weight
 class Weight(object):
     def __init__(self):
-        self.task2task = 3
+        self.task2task = 5
         self.task2tag  = 1
-        self.task2project = 6
+        self.task2project = 3
+        self.task2annotation = 50
 weight = Weight()
 
 ## layout
@@ -48,13 +50,14 @@ misc = Misc()
 # colors
 class Colors(object):
     def __init__(self):
-        self.blockedColor = 'gold4'
-        self.unblockedColor = 'green'
-        self.doneColor = 'grey'
-        self.waitColor = 'white'
-        self.deletedColor = 'pink'
-        self.tagColor = 'white'
-        self.elseColor = 'white'
+        self.annotation = 'yellow'
+        self.blocked = 'gold4'
+        self.unblocked = 'green'
+        self.done = 'grey'
+        self.wait = 'white'
+        self.deleted = 'pink'
+        self.tag = 'white'
+        self.other = 'white'
 colors = Colors()
 
 
@@ -74,9 +77,8 @@ dotter = Dotter(layout, colors, weight, misc)
 collection = Collector(data, excludedTags)
 dotSource = dotter.inputString(data, collection,
                                excludedTaskStatus, excludedTaggedTaskStatus,
-                               tagsASnodes, projectsASnodes)
+                               tagsASnodes, projectsASnodes, annotationsASnodes)
 #:print(dotSource)
-
 ## calling dot
 png, err = dot(dotSource)
 if err != b'':
