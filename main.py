@@ -24,7 +24,7 @@ tasks = taskwarriorJSON(taskWarriorArgs)
 for conf in [configs[c] for c in confKeys]:
 
     ## prepare data
-    collections = Collector(tasks, conf.excluded.tags)
+    collections = Collector(tasks, conf.excluded)
 
     connects = connector(conf, collections, tasks)
     nods = nodes(conf, collections, tasks)

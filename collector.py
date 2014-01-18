@@ -19,12 +19,12 @@ class Annotation(object):
 
 class Collector(object):
 
-    def __init__(self, tasks, excludedTags):
+    def __init__(self, tasks, excluded):
         self.tasks = tasks
         self.projects = self.projects()
-        self.tags = excludeElementsFrom(excludedTags, self.tags())
+        self.tags = excludeElementsFrom(excluded.tags, self.tags())
         self.uuids = self.uuids()
-        self.annotations = self.annotations()
+        self.annotations = self.annotations(excluded.annotationStatus)
 
     def projects(self):
         res = set()
@@ -54,10 +54,10 @@ class Collector(object):
         return res
 
 
-    def annotations(self):
+    def annotations(self, excludedAnnotationStatus):
         res = []
         for task in self.tasks:
-            if 'annotations' in task:
+            if 'annotations' in task and task['status'] not in excludedAnnotationStatus:
                 for a in task['annotations']:
                     res.append(Annotation(a['entry'], a['description']))
         return res

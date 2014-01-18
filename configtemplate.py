@@ -45,10 +45,9 @@ class Weights(object):
 class Conf(object):
     def __init__(self):
         self.filename = 'dotwarrior.svg'
-        self.layout = "neato"
+        self.layout = "dot"
         self.colors = Colors()
         self.weights = Weights()
         self.misc = Miscs()
         self.excluded = Excluded()
         self.nodes = Nodes()
-
