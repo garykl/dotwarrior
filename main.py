@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import sys
 
-from extern import dot, taskwarriorJSON
+from extern import interpreteInput, dot, taskwarriorJSON
 from dotter import dotCode, connector, nodes
 from collector import Collector
-from config import Conf
+from config import configs
 # Typical command line usage:
 #
 # python graphdeps.py TASKFILTER
@@ -16,22 +16,22 @@ from config import Conf
 # available colors
 # full list of colors here: http://www.graphviz.org/doc/info/colors.html
 
-
-query = ' '.join(sys.argv[1:])
+(confKeys, taskWarriorArgs) = interpreteInput(sys.argv[1:])
 
 ## read data
-conf = Conf()
-tasks = taskwarriorJSON(query)
+tasks = taskwarriorJSON(taskWarriorArgs)
 
-## prepare data
-collections = Collector(tasks, conf.excluded.tags)
+for conf in [configs[c] for c in confKeys]:
 
-connects = connector(conf, collections, tasks)
-nods = nodes(conf, collections, tasks)
+    ## prepare data
+    collections = Collector(tasks, conf.excluded.tags)
 
-## write data
-dotSource = dotCode(conf, nods, connects)
+    connects = connector(conf, collections, tasks)
+    nods = nodes(conf, collections, tasks)
 
-## calling dot
-dot(dotSource)
+    ## write data
+    dotSource = dotCode(conf, nods, connects)
+
+    ## calling dot
+    dot(conf, dotSource)
 

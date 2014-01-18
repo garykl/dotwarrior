@@ -230,4 +230,3 @@ class Dotter(object):
 def dotCode(conf, nodes, connects):
     dotter = Dotter(conf)
     return dotter.inputString(nodes, connects)
-

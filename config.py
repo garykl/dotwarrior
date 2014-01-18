@@ -26,18 +26,17 @@ class Nodes(object):
     def __init__(self):
         self.tasks = True
         self.tags = True
-        self.projects = False
+        self.projects = True
         self.annotations = True
 
 ## fine tune node existence and connection creation
 class Excluded(object):
     def __init__(self):
-        self.tags = ['program'] # those nodes are supressed
-        self.taggedTaskStatus = set(['deleted']) # connection between tags and those are supressed
+        self.tags = [] # those nodes are supressed
         self.taskStatus = ['deleted'] # nodes removed
-        self.annotationStatus = ['completed']
-        for e in self.taskStatus:  # excluded tasks do not need connections
-            self.taggedTaskStatus.add(e)
+        self.taggedTaskStatus = set(['deleted']) # connection between tags and those are supressed
+        self.annotationStatus = ['deleted', 'completed']
+        # excluded tasks do not need connections
 
 ## edges weight
 class Weights(object):
@@ -50,6 +49,7 @@ class Weights(object):
 
 class Conf(object):
     def __init__(self):
+        self.filename = 'dotwarrior.svg'
         self.layout = layout
         self.colors = Colors()
         self.weights = Weights()
@@ -57,3 +57,21 @@ class Conf(object):
         self.excluded = Excluded()
         self.nodes = Nodes()
 
+
+## many configs are possible
+default = Conf()
+mydefault = Conf()
+mydefault.filename = 'mydefault'
+mydefault.excluded.tags = ['program', 'MPI']
+mydefault.excluded.taggedTaskStatus = ['deleted', 'completed']
+mydefault.excluded.taskStatus = ['deleted', 'completed']
+mydefault.excluded.annotationStatus = ['completed']
+noprojects = Conf()
+noprojects.filename = 'noproject'
+noprojects.nodes.projects = False
+noprojects.excluded.tags = ['program']
+noprojects.weights.task2tag = 5
+
+configs = {'df': default,
+           '': mydefault,
+           'np': noprojects}
