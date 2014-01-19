@@ -17,7 +17,7 @@ class Annotation(object):
         self.description = description
 
 
-class Collector(object):
+class TaskwarriorExploit(object):
 
     def __init__(self, tasks, excluded):
         self.tasks = tasks
@@ -52,7 +52,6 @@ class Collector(object):
         for task in self.tasks:
             res.append(task['uuid'])
         return res
-
 
     def annotations(self, excludedAnnotationStatus):
         res = []

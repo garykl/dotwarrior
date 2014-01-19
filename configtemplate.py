@@ -1,3 +1,20 @@
+# Copright 2014 Gary Klindt
+#
+# This file is part of dotwarrior.
+#
+# dotwarrior is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# dotwarrio is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with dotwarrior.  If not, see <http://www.gnu.org/licenses/>.
+
 class Miscs(object):
     def __init__(self):
         self.charsPerLine = 20;
@@ -14,7 +31,10 @@ class Colors(object):
         self.wait = 'white'
         self.deleted = 'pink'
         self.tag = 'white'
+        self.fillTag = 'black'
+        self.fontTag = 'white'
         self.other = 'white'
+        self.fontDefault = 'black'
 
 ## what is a node?
 class Nodes(object):
@@ -45,9 +65,22 @@ class Weights(object):
 class Conf(object):
     def __init__(self):
         self.filename = 'dotwarrior.svg'
-        self.layout = "dot"
+        self.layout = "twopi"
         self.colors = Colors()
         self.weights = Weights()
         self.misc = Miscs()
         self.excluded = Excluded()
         self.nodes = Nodes()
+
+
+from copy import deepcopy
+class WarriorSetting(object):
+    """
+    dotwarrior only makes sense, if you think about a meaningful
+    combination of the taskwarrior and dotwarrior settings.
+    """
+    def __init__(self, taskwarriorArgs, dotwarriorConf, filename=''):
+        self.taskwarriorArgs = deepcopy(taskwarriorArgs)
+        self.dotwarriorConf = deepcopy(dotwarriorConf)
+        self.dotwarriorConf.filename = deepcopy(filename)
+

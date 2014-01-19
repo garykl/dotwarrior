@@ -1,8 +1,24 @@
+# Copright 2014 Gary Klindt
+#
+# This file is part of dotwarrior.
+#
+# dotwarrior is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# dotwarrio is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with dotwarrior.  If not, see <http://www.gnu.org/licenses/>.
+
 import textwrap
 
-## helpers
 
-def connector(conf, collections, tasks):
+def connector(conf, collections):
     """
     generate data structure containing all data
     that is necessary for feeding the connections
@@ -58,7 +74,7 @@ def connector(conf, collections, tasks):
         pass
 
     res = []
-    for t in tasks:
+    for t in collections.tasks:
         if conf.nodes.tasks:
             res = res + taskVStask(t, collections.uuids)
         if conf.nodes.tags:
@@ -72,7 +88,7 @@ def connector(conf, collections, tasks):
 def tagVSproject(self):
         pass
 
-def nodes(conf, collections, tasks):
+def nodes(conf, collections):
     """
     return all necessary information for nodes creation
     by the dot program.
@@ -84,9 +100,9 @@ def nodes(conf, collections, tasks):
             self.shape = attrs.get('shape', 'box')
             self.style = attrs.get('style', '')
             self.fillcolor = attrs.get('fillcolor', 'white')
-            self.fontcolor = attrs.get('fontcolor', 'black')
+            self.fontcolor = attrs.get('fontcolor',conf.colors.fontDefault)
             self.fontsize = attrs.get('fontsize', '10')
-            self.color = attrs.get('color', 'black')
+            self.color = attrs.get('color', 'white')
             self.penwidth = attrs.get('penwidth', conf.misc.penwidth)
 
     def project(p):
@@ -100,9 +116,9 @@ def nodes(conf, collections, tasks):
     def tag(t):
         return Ret(t, t,
                    shape='ellipse',
-                   fillcolor=conf.colors.project,
+                   fillcolor=conf.colors.fillTag,
                    style='filled',
-                   fontcolor='white')
+                   fontcolor=conf.colors.fontTag)
 
     def annotation(a):
         label = ''
@@ -130,7 +146,7 @@ def nodes(conf, collections, tasks):
             else :
                 hasPendingDeps = False
                 for depend in t['depends'].split(','):
-                    for t2 in tasks:
+                    for t2 in collections.tasks:
                         if t2['uuid'] == depend:
                             if not t2['status'] in conf.excluded.annotationStatus:
                                 hasPendingDeps = True
@@ -164,7 +180,7 @@ def nodes(conf, collections, tasks):
                    style=style)
 
     res = []
-    for t in tasks:
+    for t in collections.tasks:
         res.append(task(t))
     if conf.nodes.projects:
         res = res + list(map(project, collections.projects))
@@ -176,57 +192,43 @@ def nodes(conf, collections, tasks):
     return filter(lambda x: x != '', res)
 
 
-class Dotter(object):
+def dotsource(conf, nodes, connections):
 
-    def __init__(self, conf):
-        self.HEADER = "digraph  dependencies {"
-        self.HEADER += "layout={0}; ".format(conf.layout)
-        self.HEADER += "splines=true; "
-        self.HEADER += "overlap=scalexy; "
-        self.HEADER += "rankdir=LR;"
-        self.HEADER += "weight=2;"
-        self.FOOTER = "}"
-        self.layout = conf.layout
-        self.misc = conf.misc
-        self.colors = conf.colors
-        self.weights = conf.weights
+    HEADER = "digraph  dependencies {"
+    HEADER += "layout={0}; ".format(conf.layout)
+    HEADER += "splines=true; "
+    HEADER += "overlap=scalexy; "
+    HEADER += "rankdir=LR;"
+    HEADER += "weight=2;"
+    FOOTER = "}"
 
-
-    def node(self, n):
+    def node(n):
         line = '"{0}"'.format(n.id)
         line += '[label="{0}"]'.format(n.label)
         line += '[shape={0}]'.format(n.shape)
         line += '[fillcolor={0}]'.format(n.fillcolor)
+        line += '[fontcolor={0}]'.format(n.fontcolor)
         line += '[style={0}]'.format(n.style)
         line += '[penwidth={0}]'.format(n.penwidth)
         return line
 
 
-    def nodeVSnode(self, con):
+    def nodeVSnode(con):
         line = '"{0}" -> "{1}"'.format(con.id1, con.id2)
         line += '[style={0}]'.format(con.style)
         line += '[color={0}]'.format(con.color)
         line += '[weight={0}]'.format(con.weight)
         return line
 
+    res = [HEADER]
 
+    # nodes
+    for n in nodes:
+        res.append(node(n))
 
-    def inputString(self, nodes, connects):
-        res = [self.HEADER]
+    # edges
+    for con in connections:
+        res.append(nodeVSnode(con))
 
-        # nodes
-        for n in nodes:
-            res.append(self.node(n))
-
-        # edges
-        for con in connects:
-            res.append(self.nodeVSnode(con))
-
-        res.append(self.FOOTER)
-
-        return "\n".join(res)
-
-
-def dotCode(conf, nodes, connects):
-    dotter = Dotter(conf)
-    return dotter.inputString(nodes, connects)
+    res.append(FOOTER)
+    return "\n".join(res)
