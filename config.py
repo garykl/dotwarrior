@@ -21,10 +21,12 @@ default = Conf()
 
 mydefault = Conf()
 mydefault.filename = 'mydefault'
+mydefault.layout = 'circo' # circo seems to be slow, but stable
 mydefault.excluded.tags = ['program']
 mydefault.excluded.taggedTaskStatus = ['deleted', 'completed']
 mydefault.excluded.taskStatus = ['deleted', 'completed']
 mydefault.excluded.annotationStatus = ['completed']
+mydefault.weights.task2project = 20
 
 noprojects = Conf()
 noprojects.filename = 'noproject'

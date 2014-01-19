@@ -1,21 +1,21 @@
 # dotwarrior
 
 dotwarrior is glueing software, mainly, which connect the command line task
-manager utility *taskwarrior* and the network visualising toolkit *graphviz*
+manager utility `taskwarrior` and the network visualising toolkit `graphviz`
 to produce meaningful bullet lists.
 
 There are four different types of nodes that are considered:
-1) task
-2) tag
-3) project
-4) annotation
+1. task
+2. tag
+3. project
+4. annotation
 It's to a large extent customizable, which nodes to show and which not.
 
 There different types of connections considered:
-1) task - task
-2) task - tag
-3) task - annotation
-4) tag - project is planned
+1. task - task
+2. task - tag
+3. task - annotation
+4. tag - project is planned
 whose visiblity can be configured and the the strangth of the effect on it
 vertices
 
@@ -52,9 +52,10 @@ configuration is done in `python3`.
 One or more configuration objects (configtemplate.Conf) can be instantiated,
 and dynamically chosen at run-time through configurable command line arguments.
 
-An example configuration is given in `config.py.
+An example configuration is given in `config.py`.
 
-The following paragraphs provide an overview over the options.
+The following paragraphs provide an overview over the options. It's probably
+a good idea to read `configtemplate.py` parallel to the following.
 
 ### colors
 different colors for different status of tasks can be / are set, like
