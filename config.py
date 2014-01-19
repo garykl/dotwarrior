@@ -37,12 +37,20 @@ configs = {'df': default,
            '': mydefault,
            'np': noprojects}
 
-registeredLists = [WarriorSetting(['pro:GroupRetreat2014'],
-                                  mydefault,
-                                  filename='groupretreat'),
-                   WarriorSetting(['+MPI'],
-                                  mydefault,
-                                  filename='work'),
-                   WarriorSetting([''],
-                                  noprojects,
-                                  filename='global')]
+registeredLists = [
+        WarriorSetting(['pro:GroupRetreat2014'],
+                       mydefault,
+                       filename='groupretreat'),
+
+        WarriorSetting(['+MPI'],
+                       mydefault,
+                       filename='work'),
+
+        WarriorSetting(['project:dotwarrior'],
+                       mydefault,
+                       filename='dotwarrior'),
+
+        WarriorSetting([''],
+                       noprojects,
+                       filename='global')
+        ]

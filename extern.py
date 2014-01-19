@@ -64,13 +64,16 @@ def taskwarriorJSON(options):
 
 def dot(conf, instruction):
     'call dot, returning stdout and stdout'
+    svgViewer = "eog"
+    dotwarriorFolder = "/home/gary/.dotwarrior/"
     dot = Popen('dot -T svg'.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
     (png, err) = dot.communicate(instruction.encode())
     if err != b'':
         print ('Error calling dot:')
         print (err.strip())
     else:
-        with open('{0}.svg'.format(conf.filename), 'w') as f:
+        with open('{0}.svg'.format(dotwarriorFolder + conf.filename), 'w') as f:
             f.write(png.decode('utf-8'))
+            print(svgViewer + " " + dotwarriorFolder + conf.filename + ".svg &")
 
 
