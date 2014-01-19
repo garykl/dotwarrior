@@ -21,7 +21,7 @@ default = Conf()
 
 mydefault = Conf()
 mydefault.filename = 'mydefault'
-mydefault.excluded.tags = ['program', 'MPI']
+mydefault.excluded.tags = ['program']
 mydefault.excluded.taggedTaskStatus = ['deleted', 'completed']
 mydefault.excluded.taskStatus = ['deleted', 'completed']
 mydefault.excluded.annotationStatus = ['completed']
