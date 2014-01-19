@@ -56,9 +56,9 @@ class Excluded(object):
 ## edges weight
 class Weights(object):
     def __init__(self):
-        self.task2task = 11
+        self.task2task = 31
         self.task2tag  = 1
-        self.task2project = 6
+        self.task2project = 5
         self.task2annotation = 99
 
 

@@ -1,23 +1,30 @@
 # dotwarrior
 
-dotwarrior is glueing software, mainly, which connect the command line task
-manager utility `taskwarrior` and the network visualising toolkit `graphviz`
+dotwarrior is glueing software, which connect the command line task
+manager utility `taskwarrior` with the network visualising toolkit `graphviz`
 to produce meaningful bullet lists.
 
-There are four different types of nodes that are considered:
+There are four different types of nodes considered:
+
 1. task
 2. tag
 3. project
 4. annotation
+
 It's to a large extent customizable, which nodes to show and which not.
 
-There different types of connections considered:
+There will be five different types of connections considered:
+
 1. task - task
 2. task - tag
 3. task - annotation
-4. tag - project is planned
-whose visiblity can be configured and the the strangth of the effect on it
-vertices
+4. task - project
+5. tag - project is planned
+
+whose visiblity can be configured and the strength of the effect on the nodes
+it is connected to, which, carefully used, enhances clear view.
+
+dotwarrior is written in `python3`.
 
 ## usage
 
@@ -27,9 +34,9 @@ can be passed to `taskwarrior`.
 
 After setting up ...
 
-    $> ln -s /path/to/dotwarrior.py /path/inside/$PATH/dotwarrior  # and
+    $> ln -s /path/to/dotwarrior.py /path/inside/$PATH/dotwarrior
     $> chmod u+x /path/to/dotwarrior.py
-    $> mkdir ~/.dotwarrior
+    $> mkdir ~/.dotwarrior  # place for saving images
 
 
 ... dotwarrior can be called
@@ -83,3 +90,14 @@ filename, penwidth, characters per line, ...
 The keys in `configs` can be used as command line options by prefixing `--`.
 If such an option is given, the corresponding value of `configs` is used.
 If multiple options are given, one image for option is created.
+
+## examples
+
+The file `config.py` contains an example of a configuration described above.
+Default values can be found in `configtemplate.py`.
+
+The folder examples contain three images with the call
+
+    $> dotwarrior project:dotwarrior
+
+with slightly different settings and different layouts.
