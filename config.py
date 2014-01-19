@@ -27,6 +27,16 @@ mydefault.excluded.taggedTaskStatus = ['deleted', 'completed']
 mydefault.excluded.taskStatus = ['deleted', 'completed']
 mydefault.excluded.annotationStatus = ['completed']
 
+oneProject = Conf()
+oneProject.filename = 'oneProject'
+oneProject.layout = 'neato'
+oneProject.excluded.taskStatus = ['deleted', 'completed']
+oneProject.excluded.taggedTaskStatus = ['deleted', 'completed']
+oneProject.excluded.tags = ['MPI']
+oneProject.nodes.projects = False
+oneProject.nodes.annotations = True
+oneProject.weights.task2tag = 20
+
 noprojects = Conf()
 noprojects.filename = 'noproject'
 noprojects.layout = 'neato'
@@ -36,7 +46,8 @@ noprojects.nodes.annotations = False
 noprojects.weights.task2tag = 20
 
 
-configs = {'df': default,
+configs = {'one': oneProject,
+           'df': default,
            '': mydefault,
            'np': noprojects}
 
