@@ -9,15 +9,24 @@ to produce meaningful bullet lists.
 You can call dotwarrior from the command line with the same filter options that
 can be past to taskwarrior.
 
+
 After setting up ...
+
 $> ln -s /path/to/dotwarrior.py /path/inside/$PATH/dotwarrior  # and
+
 $> chmod u+x /path/to/dotwarrior.py
+
 $> mkdir ~/.dotwarrior
 
+
 ... dotwarrior can be called
+
 $> dotwarrior
+
 $> dotwarrior project:Presentation
+
 $> dotwarrior +work
+
 
 These commands ask taskwarrior for data, which is then transformed and
 past to the dot program.
