@@ -71,16 +71,3 @@ class Conf(object):
         self.misc = Miscs()
         self.excluded = Excluded()
         self.nodes = Nodes()
-
-
-from copy import deepcopy
-class WarriorSetting(object):
-    """
-    dotwarrior only makes sense, if you think about a meaningful
-    combination of the taskwarrior and dotwarrior settings.
-    """
-    def __init__(self, taskwarriorArgs, dotwarriorConf, filename=''):
-        self.taskwarriorArgs = deepcopy(taskwarriorArgs)
-        self.dotwarriorConf = deepcopy(dotwarriorConf)
-        self.dotwarriorConf.filename = deepcopy(filename)
-

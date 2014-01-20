@@ -16,6 +16,7 @@
 # along with dotwarrior.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+import sys
 from subprocess import Popen, PIPE
 
 
@@ -40,11 +41,12 @@ def splitList(fn, ll):
 def interpreteInput(args):
     def fun(a):
         return '--' in a
-    (confOptions, taskwarriorArgs) = splitList(fun, args)
+    # confOptions are specified layout configurations
+    confOptions = filter(fun, args)
     confKeys = list(map(lambda x: x[2:], confOptions)) # cut the leading --
     if len(confKeys) == 0:
         confKeys = ['']
-    return (confKeys, taskwarriorArgs)
+    return confKeys
 
 
 def taskwarrior(cmd):
@@ -53,13 +55,13 @@ def taskwarrior(cmd):
     return tw.communicate()
 
 
-def taskwarriorJSON(options):
-    'call taskwarrior, returning objects from json'
-    JSON_START = '['
-    JSON_END = ']'
-    query = ' '.join(options)
-    result, err = taskwarrior('export %s' % query)
-    return json.loads(JSON_START + result.decode('utf8') + JSON_END)
+def taskwarriorJSON():
+    """
+    read input from taskwarrior via stdin,
+    return list of dictionaries.
+    """
+    taskwarrioroutput = sys.stdin.read()
+    return json.loads('[' + taskwarrioroutput + "]")
 
 
 def dot(conf, instruction):

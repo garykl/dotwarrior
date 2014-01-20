@@ -21,7 +21,7 @@ import sys
 from extern import interpreteInput, dot, taskwarriorJSON
 from dotter import dotsource, connector, nodes
 from validate import TaskwarriorExploit
-from config import configs, registeredLists
+from config import configs
 
 
 def prog(conf, tasks):
@@ -42,16 +42,8 @@ def prog(conf, tasks):
     dot(conf, dotSource)
 
 
-(confKeys, taskWarriorArgs) = interpreteInput(sys.argv[1:])
+confKeys = interpreteInput(sys.argv[1:])
 
-if 'all' in confKeys:
-
-    for warriorsetting in registeredLists:
-        tasks = taskwarriorJSON(warriorsetting.taskwarriorArgs)
-        prog(warriorsetting.dotwarriorConf, tasks)
-
-else:
-
-    tasks = taskwarriorJSON(taskWarriorArgs)
-    for conf in [configs[c] for c in confKeys]:
-        prog(conf, tasks)
+tasks = taskwarriorJSON()
+for conf in [configs[c] for c in confKeys]:
+    prog(conf, tasks)

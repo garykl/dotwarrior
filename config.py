@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with dotwarrior.  If not, see <http://www.gnu.org/licenses/>.
 
-from configtemplate import Conf, WarriorSetting
+from configtemplate import Conf
 
 default = Conf()
 
@@ -26,6 +26,16 @@ mydefault.excluded.tags = ['program']
 mydefault.excluded.taggedTaskStatus = ['deleted', 'completed']
 mydefault.excluded.taskStatus = ['deleted', 'completed']
 mydefault.excluded.annotationStatus = ['completed']
+
+tagWeight = Conf()
+tagWeight.filename = 'tagWeight'
+tagWeight.layout = 'neato'
+tagWeight.excluded.taskStatus = ['deleted', 'completed']
+tagWeight.excluded.taggedTaskStatus = ['deleted', 'completed']
+tagWeight.excluded.tags = ['MPI']
+tagWeight.nodes.projects = False
+tagWeight.nodes.annotations = True
+tagWeight.weights.task2tag = 70
 
 oneProject = Conf()
 oneProject.filename = 'oneProject'
@@ -46,25 +56,9 @@ noprojects.nodes.annotations = False
 noprojects.weights.task2tag = 20
 
 
-configs = {'one': oneProject,
+configs = {'tag': tagWeight,
+           'one': oneProject,
            'df': default,
            '': mydefault,
            'np': noprojects}
 
-registeredLists = [
-        WarriorSetting(['pro:GroupRetreat2014'],
-                       mydefault,
-                       filename='groupretreat'),
-
-        WarriorSetting(['+MPI'],
-                       mydefault,
-                       filename='work'),
-
-        WarriorSetting(['project:dotwarrior'],
-                       mydefault,
-                       filename='dotwarrior'),
-
-        WarriorSetting([''],
-                       noprojects,
-                       filename='global')
-        ]
