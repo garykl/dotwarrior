@@ -39,14 +39,25 @@ def splitList(fn, ll):
 
 
 def interpreteInput(args):
-    def fun(a):
+    """
+    input can be ...
+    ... a filename, preceded with '-'
+    ... a configuration key, preceded with '--'
+    """
+    def isConf(a):
         return '--' in a
-    # confOptions are specified layout configurations
-    confOptions = filter(fun, args)
+    (confOptions, otherOptions) = splitList(isConf, args)
     confKeys = list(map(lambda x: x[2:], confOptions)) # cut the leading --
+                                                       # for each key, although
+                                                       # we only need one!
+    def isFile(s):
+        return '-' in s
+    (optionKey, optionValue) = splitList(isFile, otherOptions) # so far there
+    filename = optionValue[0]                                  # can only be one file
     if len(confKeys) == 0:
         confKeys = ['']
-    return confKeys
+
+    return (filename, confKeys[0])
 
 
 def taskwarrior(cmd):
@@ -64,18 +75,17 @@ def taskwarriorJSON():
     return json.loads('[' + taskwarrioroutput + "]")
 
 
-def dot(conf, instruction):
+def dot(conf, instruction, filename):
     'call dot, returning stdout and stdout'
     svgViewer = "eog"
-    dotwarriorFolder = "/home/gary/.dotwarrior/"
     dot = Popen('dot -T svg'.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
     (png, err) = dot.communicate(instruction.encode())
     if err != b'':
         print ('Error calling dot:')
         print (err.strip())
     else:
-        with open('{0}.svg'.format(dotwarriorFolder + conf.filename), 'w') as f:
+        with open('{0}.svg'.format(filename), 'w') as f:
             f.write(png.decode('utf-8'))
-            print(svgViewer + " " + dotwarriorFolder + conf.filename + ".svg &")
+            print(svgViewer + " " + filename + ".svg &")
 
 

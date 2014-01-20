@@ -39,11 +39,12 @@ def prog(conf, tasks):
     (nods, connects) = graph(conf, taskwarriordata)
     dotSource = dotsource(conf, nods, connects)
 
-    dot(conf, dotSource)
+    return dotSource
 
 
-confKeys = interpreteInput(sys.argv[1:])
+(filename, confKey) = interpreteInput(sys.argv[1:])
 
 tasks = taskwarriorJSON()
-for conf in [configs[c] for c in confKeys]:
-    prog(conf, tasks)
+conf = configs[confKey]
+dotSource = prog(conf, tasks)
+dot(conf, dotSource, filename)

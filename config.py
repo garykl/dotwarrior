@@ -20,7 +20,6 @@ from configtemplate import Conf
 default = Conf()
 
 mydefault = Conf()
-mydefault.filename = 'mydefault'
 mydefault.layout = 'neato' # circo seems to be slow, but stable
 mydefault.excluded.tags = ['program']
 mydefault.excluded.taggedTaskStatus = ['deleted', 'completed']
@@ -28,7 +27,6 @@ mydefault.excluded.taskStatus = ['deleted', 'completed']
 mydefault.excluded.annotationStatus = ['completed']
 
 tagWeight = Conf()
-tagWeight.filename = 'tagWeight'
 tagWeight.layout = 'neato'
 tagWeight.excluded.taskStatus = ['deleted', 'completed']
 tagWeight.excluded.taggedTaskStatus = ['deleted', 'completed']
@@ -38,7 +36,6 @@ tagWeight.nodes.annotations = True
 tagWeight.weights.task2tag = 70
 
 oneProject = Conf()
-oneProject.filename = 'oneProject'
 oneProject.layout = 'neato'
 oneProject.excluded.taskStatus = ['deleted', 'completed']
 oneProject.excluded.taggedTaskStatus = ['deleted', 'completed']
@@ -48,7 +45,6 @@ oneProject.nodes.annotations = True
 oneProject.weights.task2tag = 20
 
 noprojects = Conf()
-noprojects.filename = 'noproject'
 noprojects.layout = 'neato'
 noprojects.nodes.projects = False
 noprojects.excluded.tags = ['program']

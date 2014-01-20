@@ -2,7 +2,7 @@
 
 dotwarrior is glueing software, which connect the command line task
 manager utility `taskwarrior` with the network visualising toolkit `graphviz`
-to produce meaningful bullet lists.
+to produce meaningful bullet lists in the form of a graph.
 
 There are four different types of nodes considered:
 
@@ -11,9 +11,10 @@ There are four different types of nodes considered:
 3. project
 4. annotation
 
-It's to a large extent customizable, which nodes to show and which not.
+It's to a large extent customizable, which nodes to show and which not and
+how they look like.
 
-There will be five different types of connections considered:
+There will be five different types of connections:
 
 1. task - task
 2. task - tag
@@ -41,9 +42,12 @@ After setting up ...
 
 ... dotwarrior can be called
 
-    $> taskwarrior export | dotwarrior
-    $> taskwarrior export project:Presentation | dotwarrior
-    $> taskwarrior export +work | dotwarrior
+    $> taskwarrior export | dotwarrior -o out
+    $> taskwarrior export project:Presentation | dotwarrior -o presi
+    $> taskwarrior export +work | dotwarrior -o constr
+
+The `-o` option is used to provide a filename. The suffix `.svg` is appended
+by the script.
 
 Note, that taskwarrior must be invoked with the export option, the output
 data in the JSON format, which is the piped into dotwarrior. As a consequence,
@@ -60,15 +64,18 @@ formats of graphviz).
 
 ## configuration
 
-configuration is done in `python3`.
+configuration is done in `python3`, but the plan is to read from a configuration
+file.
 
-One or more configuration objects (configtemplate.Conf) can be instantiated,
-and dynamically chosen at run-time through configurable command line arguments.
+One or more configuration objects (configtemplate.Conf) are instantiated, one
+of them isdynamically chosen at run-time through configurable command
+line arguments.
 
 An example configuration is given in `config.py`.
 
-The following paragraphs provide an overview over the options. It's probably
-a good idea to read `configtemplate.py` parallel to the following.
+The following paragraphs provide an overview over the planned and partly
+realized configuration options. It's probably
+a good idea to read `configtemplate.py` in parallel to the following.
 
 ### colors
 different colors for different status of tasks can be / are set, like
