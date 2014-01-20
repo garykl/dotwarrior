@@ -41,16 +41,22 @@ After setting up ...
 
 ... dotwarrior can be called
 
-    $> dotwarrior
-    $> dotwarrior project:Presentation
-    $> dotwarrior +work
+    $> taskwarrior export | dotwarrior
+    $> taskwarrior export project:Presentation | dotwarrior
+    $> taskwarrior export +work | dotwarrior
 
+Note, that taskwarrior must be invoked with the export option, the output
+data in the JSON format, which is the piped into dotwarrior. As a consequence,
+the full power of taskwarrior is conserved as it is.
 
-These commands ask `taskwarrior` for data, which is then transformed and
-past to the `dot` program.
+dotwarrior transforms the JSON data into a usable format for the dot
+program, while using many customizable parameters for influencing
+dot's behavior.
 
-The default location for produced images is ~/.dotwarrior
-The image file type is SVG.
+The default location for produced images is ~/.dotwarrior (which will be
+changed to be a command line argument).
+The image file type is SVG (which will be expanded to all possible output
+formats of graphviz).
 
 ## configuration
 
@@ -98,6 +104,6 @@ Default values can be found in `configtemplate.py`.
 
 The folder examples contain three images with the call
 
-    $> dotwarrior project:dotwarrior
+    $> taskwarrior export project:dotwarrior | dotwarrior
 
 with slightly different settings and different layouts.
