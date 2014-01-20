@@ -57,8 +57,6 @@ dotwarrior transforms the JSON data into a usable format for the dot
 program, while using many customizable parameters for influencing
 dot's behavior.
 
-The default location for produced images is ~/.dotwarrior (which will be
-changed to be a command line argument).
 The image file type is SVG (which will be expanded to all possible output
 formats of graphviz).
 
