@@ -25,13 +25,9 @@ There will be five different types of connections:
 whose visiblity can be configured and the strength of the effect on the nodes
 it is connected to, which, carefully used, enhances clear view.
 
-dotwarrior is written in `python3`.
+dotwarrior is written in `python3`, but works with `python2` as well.
 
 ## usage
-
-You can call `dotwarrior` from the command line with the same filter options that
-can be passed to `taskwarrior`.
-
 
 After setting up ...
 
@@ -42,23 +38,17 @@ After setting up ...
 
 ... dotwarrior can be called
 
-    $> taskwarrior export | dotwarrior -o out
-    $> taskwarrior export project:Presentation | dotwarrior -o presi
-    $> taskwarrior export +work | dotwarrior -o constr
+    $> taskwarrior export | dotwarrior out
+    $> taskwarrior export project:Presentation | dotwarrior presi
+    $> taskwarrior export +work | dotwarrior constr
 
-The `-o` option is used to provide a filename. The suffix `.svg` is appended
-by the script.
+An argument without a dash is interpeted as filename, which means, we just
+created three files out.svg, presi.svg and constr.svg. More possible
+output formats will follow.
 
 Note, that taskwarrior must be invoked with the export option, the output
-data in the JSON format, which is the piped into dotwarrior. As a consequence,
+data in JSON format, is piped into dotwarrior. As a consequence,
 the full power of taskwarrior is conserved as it is.
-
-dotwarrior transforms the JSON data into a usable format for the dot
-program, while using many customizable parameters for influencing
-dot's behavior.
-
-The image file type is SVG (which will be expanded to all possible output
-formats of graphviz).
 
 ## configuration
 
@@ -66,10 +56,10 @@ configuration is done in `python3`, but the plan is to read from a configuration
 file.
 
 One or more configuration objects (configtemplate.Conf) are instantiated, one
-of them isdynamically chosen at run-time through configurable command
+of them is dynamically chosen at run-time through configurable command
 line arguments.
 
-An example configuration is given in `config.py`.
+Several example configurations are given in `config.py`.
 
 The following paragraphs provide an overview over the planned and partly
 realized configuration options. It's probably
@@ -77,8 +67,7 @@ a good idea to read `configtemplate.py` in parallel to the following.
 
 ### colors
 different colors for different status of tasks can be / are set, like
-completed, pending, deleted, ...
-being a tag, a project, ...
+completed, pending, deleted or being a tag, a project, ...
 
 ### nodes
 which nodes shall be shown? `True` means show, `False` mean don't show.
@@ -112,3 +101,9 @@ The folder examples contain three images with the call
     $> taskwarrior export project:dotwarrior | dotwarrior
 
 with slightly different settings and different layouts.
+
+## How could I
+
+This project was a spontaneous effect, inspired and build out of
+[graphdeps](http://pastebin.com/9EyvEL0M/ "Graphdeps"), after finding
+the inspiring taskwarrior.
