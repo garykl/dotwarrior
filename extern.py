@@ -41,19 +41,16 @@ def splitList(fn, ll):
 def interpreteInput(args):
     """
     input can be ...
-    ... a filename, preceded with '-'
     ... a configuration key, preceded with '--'
     """
     def isConf(a):
         return '--' in a
     (confOptions, otherOptions) = splitList(isConf, args)
-    confKeys = list(map(lambda x: x[2:], confOptions)) # cut the leading --
-                                                       # for each key, although
-                                                       # we only need one!
-    def isFile(s):
-        return '-' in s
-    (optionKey, optionValue) = splitList(isFile, otherOptions) # so far there
-    filename = optionValue[0]                                  # can only be one file
+    confKeys = list(map(lambda x: x[2:], confOptions))
+    if len(otherOptions) == 0:
+        filename = 'dotwarrior'
+    else:
+        filename = otherOptions[0]
     if len(confKeys) == 0:
         confKeys = ['']
 
