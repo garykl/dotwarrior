@@ -35,6 +35,15 @@ tagWeight.nodes.projects = False
 tagWeight.nodes.annotations = True
 tagWeight.weights.task2tag = 70
 
+fewProjects = Conf()
+fewProjects.layout = 'neato'
+fewProjects.excluded.taskStatus = ['deleted', 'completed']
+fewProjects.excluded.taggedTaskStatus = ['deleted', 'completed']
+fewProjects.excluded.tags = ['MPI']
+fewProjects.nodes.projects = True
+fewProjects.nodes.annotations = True
+fewProjects.weights.task2tag = 20
+
 oneProject = Conf()
 oneProject.layout = 'neato'
 oneProject.excluded.taskStatus = ['deleted', 'completed']
@@ -53,6 +62,7 @@ noprojects.weights.task2tag = 20
 
 
 configs = {'tag': tagWeight,
+           'few': fewProjects,
            'one': oneProject,
            'df': default,
            '': mydefault,
