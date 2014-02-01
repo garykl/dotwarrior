@@ -16,6 +16,19 @@
 # along with dotwarrior.  If not, see <http://www.gnu.org/licenses/>.
 
 import textwrap
+from extern import taskwarriorUrgency
+
+
+class Range(object):
+    def __init__(self, minimum, maximum):
+        self.min = minimum
+        self.max = maximum
+    def normalize(self, value):
+        """
+        normalize value, in such a way, that only
+        values between 0 and 1 are returned.
+        """
+        return (value - self.min) / (self.max - self.min)
 
 
 def connector(conf, collections):
@@ -81,7 +94,7 @@ def connector(conf, collections):
                                            task['project'],
                                            'solid',
                                            'red',
-                                           10))
+                                           conf.weights.project2tag))
         return res
 
     def tagVStags(task):
@@ -94,7 +107,7 @@ def connector(conf, collections):
                                        t2,
                                        'solid',
                                        'red',
-                                       10))
+                                       conf.weights.tag2tag))
         return res
 
     res = []
@@ -124,12 +137,22 @@ def nodes(conf, collections):
             self.id = id
             self.label = label
             self.shape = attrs.get('shape', 'box')
-            self.style = attrs.get('style', '')
+            self.style = attrs.get('style', 'solid')
             self.fillcolor = attrs.get('fillcolor', 'white')
             self.fontcolor = attrs.get('fontcolor',conf.colors.fontDefault)
             self.fontsize = attrs.get('fontsize', '10')
             self.color = attrs.get('color', 'white')
             self.penwidth = attrs.get('penwidth', conf.misc.penwidth)
+
+    def urgencyRange():
+        urgs = {}
+        mx = -777
+        mn = 777
+        for task in collections.tasks:
+            urgs[task['uuid']] = taskwarriorUrgency(task['uuid'])
+        mx = max(urgs.values())
+        mn = min(urgs.values())
+        return (Range(mn, mx), urgs)
 
     def project(p):
          return Ret(p, p,
@@ -155,6 +178,15 @@ def nodes(conf, collections):
         return Ret(a.entry, label,
                    shape='note',
                    fillcolor=conf.colors.annotation,
+                   style='filled')
+
+    def urgencyTask(t, urg, urgRange):
+        # r = '{0:1.2f}'.format(urg / maxUrg).split('.')[1]
+        # color = '\"#{0}5555\"'.format(r)
+        color = "\"{0:1.2f},0.99,0.5\"".format(urgRange.normalize(urg))
+        return Ret(t['uuid'],
+                   t['description'],
+                   fillcolor=color,
                    style='filled')
 
     def task(t):
@@ -207,8 +239,13 @@ def nodes(conf, collections):
 
     res = []
     if conf.nodes.tasks:
-        for t in collections.tasks:
-            res.append(task(t))
+        if conf.colors.byUrgency:
+            (maxUrgs, urgencies) = urgencyRange()
+            for t in collections.tasks:
+                res.append(urgencyTask(t, urgencies[t['uuid']], maxUrgs))
+        else:
+            for t in collections.tasks:
+                res.append(task(t))
     if conf.nodes.projects:
         res = res + list(map(project, collections.projects))
     if conf.nodes.tags:

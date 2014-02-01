@@ -79,11 +79,20 @@ tagtag.excluded.tags = []
 tagtag.nodes.annotations = False
 tagtag.weights.task2tag = 20
 
+urgency = Conf()
+urgency.layout = 'neato'
+urgency.colors.byUrgency = True
+urgency.excluded.tags = ['MPI']
+urgency.nodes.annotations = False
+urgency.weights.task2tag = 20
+
+
 configs = {'tag': tagWeight,
            'nt': notasks,
            'tt': tagtag,
            'few': fewProjects,
            'one': oneProject,
+           'urg': urgency,
            'df': default,
            '': mydefault,
            'np': noprojects}

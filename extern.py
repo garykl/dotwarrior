@@ -71,10 +71,19 @@ def taskwarriorJSON():
     taskwarrioroutput = sys.stdin.read()
     return json.loads('[' + taskwarrioroutput + "]")
 
+def taskwarriorUrgency(uuid):
+    """
+    execute taskwarrior for obtaining urgency value.
+    """
+    tw = Popen(['task', uuid, '_urgency'], stdout=PIPE, stderr=PIPE)
+    (out, err) = tw.communicate()
+    h = out.split()
+    return float(h[3].decode('utf-8'))
 
 def dot(conf, instruction, filename):
     'call dot, returning stdout and stdout'
     svgViewer = "eog"
+    print(instruction)
     dot = Popen('dot -T svg'.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
     (png, err) = dot.communicate(instruction.encode())
     if err != b'':

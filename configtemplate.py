@@ -35,6 +35,7 @@ class Colors(object):
         self.fontTag = 'white'
         self.other = 'white'
         self.fontDefault = 'black'
+        self.byUrgency = False
 
 ## what is a node?
 class Nodes(object):
@@ -56,7 +57,6 @@ class Excluded(object):
         self.taskStatus = ['deleted'] # nodes removed
         self.taggedTaskStatus = set(['deleted']) # connection between tags and those are supressed
         self.annotationStatus = ['deleted', 'completed']
-        # excluded tasks do not need connections
 
 ## edges weight
 class Weights(object):
@@ -65,6 +65,8 @@ class Weights(object):
         self.task2tag  = 1
         self.task2project = 5
         self.task2annotation = 99
+        self.project2tag = 10
+        self.tag2tag = 10
 
 
 class Conf(object):
