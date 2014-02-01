@@ -44,6 +44,11 @@ class Nodes(object):
         self.projects = True
         self.annotations = True
 
+class Edges(object):
+    def __init__(self):
+        self.tagVStags = False
+        self.projectVStags = False
+
 ## fine tune node existence and connection creation
 class Excluded(object):
     def __init__(self):
@@ -70,3 +75,4 @@ class Conf(object):
         self.misc = Miscs()
         self.excluded = Excluded()
         self.nodes = Nodes()
+        self.edges = Edges()

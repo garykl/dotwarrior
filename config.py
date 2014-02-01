@@ -60,8 +60,28 @@ noprojects.excluded.tags = ['program']
 noprojects.nodes.annotations = False
 noprojects.weights.task2tag = 20
 
+notasks = Conf()
+notasks.layout = 'neato'
+notasks.nodes.tasks = False
+notasks.nodes.annotations = False
+notasks.edges.projectVStags = True
+notasks.excluded.tags = []
+notasks.nodes.annotations = False
+notasks.weights.task2tag = 20
+
+tagtag = Conf()
+tagtag.layout = 'neato'
+tagtag.nodes.tasks = False
+tagtag.nodes.projects = False
+tagtag.nodes.annotations = False
+tagtag.edges.tagVStags = True
+tagtag.excluded.tags = []
+tagtag.nodes.annotations = False
+tagtag.weights.task2tag = 20
 
 configs = {'tag': tagWeight,
+           'nt': notasks,
+           'tt': tagtag,
            'few': fewProjects,
            'one': oneProject,
            'df': default,

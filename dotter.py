@@ -71,22 +71,48 @@ def connector(conf, collections):
         return res
 
     def projectVStags(task):
-        pass
+        res = []
+        if 'project' in task:
+            if task['project'] in collections.projects:
+                if 'tags' in task:
+                    for t in task['tags']:
+                        if t in collections.tags:
+                            res.append(Ret(t,
+                                           task['project'],
+                                           'solid',
+                                           'red',
+                                           10))
+        return res
+
+    def tagVStags(task):
+        res = []
+        if 'tags' in task:
+            for t1 in task['tags']:
+                for t2 in task['tags']:
+                    if t1 != t2:
+                        res.append(Ret(t1,
+                                       t2,
+                                       'solid',
+                                       'red',
+                                       10))
+        return res
 
     res = []
     for t in collections.tasks:
         if conf.nodes.tasks:
             res = res + taskVStask(t, collections.uuids)
-        if conf.nodes.tags:
-            res = res + taskVStags(t, collections.tags, conf.excluded.taggedTaskStatus)
-        if conf.nodes.projects:
-            res = res + taskVSprojects(t, conf.excluded.taskStatus)
-        if conf.nodes.annotations:
-            res = res + taskVSannotations(t)
+            if conf.nodes.tags:
+                res = res + taskVStags(t, collections.tags, conf.excluded.taggedTaskStatus)
+            if conf.nodes.projects:
+                res = res + taskVSprojects(t, conf.excluded.taskStatus)
+            if conf.nodes.annotations:
+                res = res + taskVSannotations(t)
+        if conf.edges.projectVStags:
+            res = res + projectVStags(t)
+        if conf.edges.tagVStags:
+            res = res + tagVStags(t)
     return res
 
-def tagVSproject(self):
-        pass
 
 def nodes(conf, collections):
     """
@@ -180,8 +206,9 @@ def nodes(conf, collections):
                    style=style)
 
     res = []
-    for t in collections.tasks:
-        res.append(task(t))
+    if conf.nodes.tasks:
+        for t in collections.tasks:
+            res.append(task(t))
     if conf.nodes.projects:
         res = res + list(map(project, collections.projects))
     if conf.nodes.tags:
