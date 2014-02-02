@@ -17,6 +17,12 @@
 
 from configtemplate import Conf
 
+tagHierarchy = {'topic': ['swimmer', 'dissipation', 'flowfield', 'multipole'],
+                'multipole': ['dipole', 'quadrupole', 'octupole'],
+                'action': ['implement', 'maintain', 'plot', 'test',
+                'analyse', 'decide', 'consider'],
+                'who': ['janine', 'alex', 'thomas']}
+
 default = Conf()
 
 mydefault = Conf()
@@ -83,6 +89,7 @@ urgency = Conf()
 urgency.layout = 'dot'
 urgency.colors.byUrgency = True
 urgency.excluded.tags = ['MPI']
+urgency.tagHierarchy = tagHierarchy
 urgency.nodes.annotations = False
 urgency.weights.task2tag = 20
 

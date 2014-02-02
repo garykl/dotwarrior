@@ -28,7 +28,7 @@ class Range(object):
         normalize value, in such a way, that only
         values between 0 and 1 are returned.
         """
-        return 0.7 * (value - self.min) / (self.max - self.min)
+        return (value - self.min) / (self.max - self.min)
 
 
 def connector(conf, collections):
@@ -110,6 +110,20 @@ def connector(conf, collections):
                                        conf.weights.tag2tag))
         return res
 
+    def tagHierarchy(tagHierarchy, tags):
+        res = []
+        hitags = tagHierarchy.keys()
+        for t1 in tagHierarchy:
+            for t2 in tagHierarchy[t1]:
+                if t2 in tags or t2 in hitags:
+                    res.append(Ret(t1,
+                                   t2,
+                                   'dashed',
+                                   'black',
+                                   conf.weights.tagHierarchy))
+        return res
+
+
     res = []
     for t in collections.tasks:
         if conf.nodes.tasks:
@@ -124,6 +138,8 @@ def connector(conf, collections):
             res = res + projectVStags(t)
         if conf.edges.tagVStags:
             res = res + tagVStags(t)
+    res = res + tagHierarchy(conf.tagHierarchy, collections.tags)
+
     return res
 
 
@@ -169,6 +185,13 @@ def nodes(conf, collections):
                    style='filled',
                    fontcolor=conf.colors.fontTag)
 
+    def tagHierarchy(tagHierarchy, tags):
+        ret = []
+        for t in tagHierarchy:
+            if t not in tags:
+                ret.append(tag(t))
+        return ret
+
     def annotation(a):
         label = ''
         descriptionLines = textwrap.wrap(a.description,
@@ -183,10 +206,11 @@ def nodes(conf, collections):
     def urgencyTask(t, urg, urgRange):
         # r = '{0:1.2f}'.format(urg / maxUrg).split('.')[1]
         # color = '\"#{0}5555\"'.format(r)
-        color = "\"{0:1.2f},0.99,0.5\"".format(urgRange.normalize(urg))
+        color = "\"{0:1.2f},0.99,0.59\"".format(0.5 - 0.5 * urgRange.normalize(urg))
         return Ret(t['uuid'],
                    t['description'],
                    fillcolor=color,
+                   fontcolor='white',
                    style='filled')
 
     def task(t):
@@ -246,6 +270,7 @@ def nodes(conf, collections):
         res = res + list(map(tag, collections.tags))
     if conf.nodes.annotations:
         res = res + list(map(annotation, collections.annotations))
+    res = res + tagHierarchy(conf.tagHierarchy, collections.tags)
 
     return filter(lambda x: x != '', res)
 
@@ -262,7 +287,7 @@ def dotsource(conf, nodes, connections):
 
     def node(n):
         label = '';
-        descriptionLines = textwrap.wrap(n.label);
+        descriptionLines = textwrap.wrap(n.label, width=conf.misc.charsPerLine)
         for descLine in descriptionLines:
             label += descLine + "\\n";
 

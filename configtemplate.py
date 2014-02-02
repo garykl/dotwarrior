@@ -67,6 +67,7 @@ class Weights(object):
         self.task2annotation = 99
         self.project2tag = 10
         self.tag2tag = 10
+        self.tagHierarchy = 20
 
 
 class Conf(object):
@@ -78,3 +79,4 @@ class Conf(object):
         self.excluded = Excluded()
         self.nodes = Nodes()
         self.edges = Edges()
+        self.tagHierarchy = {}

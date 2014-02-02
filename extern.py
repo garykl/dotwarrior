@@ -83,7 +83,6 @@ def taskwarriorUrgency(uuid):
 def dot(conf, instruction, filename):
     'call dot, returning stdout and stdout'
     svgViewer = "eog"
-    print(instruction)
     dot = Popen('dot -T svg'.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
     (png, err) = dot.communicate(instruction.encode())
     if err != b'':
