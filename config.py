@@ -80,7 +80,7 @@ tagtag.nodes.annotations = False
 tagtag.weights.task2tag = 20
 
 urgency = Conf()
-urgency.layout = 'neato'
+urgency.layout = 'dot'
 urgency.colors.byUrgency = True
 urgency.excluded.tags = ['MPI']
 urgency.nodes.annotations = False

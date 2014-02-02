@@ -28,7 +28,7 @@ class Range(object):
         normalize value, in such a way, that only
         values between 0 and 1 are returned.
         """
-        return (value - self.min) / (self.max - self.min)
+        return 0.7 * (value - self.min) / (self.max - self.min)
 
 
 def connector(conf, collections):
@@ -226,12 +226,6 @@ def nodes(conf, collections):
             prefix = ''
             color = conf.colors.other
 
-        label = '';
-        descriptionLines = textwrap.wrap(t['description'],
-                                         conf.misc.charsPerLine);
-        for descLine in descriptionLines:
-            label += descLine + "\\n";
-
         return Ret(t['uuid'], '{0}: {1}'.format(prefix, label),
                    shape='box',
                    fillcolor=color,
@@ -267,8 +261,13 @@ def dotsource(conf, nodes, connections):
     FOOTER = "}"
 
     def node(n):
+        label = '';
+        descriptionLines = textwrap.wrap(n.label);
+        for descLine in descriptionLines:
+            label += descLine + "\\n";
+
         line = '"{0}"'.format(n.id)
-        line += '[label="{0}"]'.format(n.label)
+        line += '[label="{0}"]'.format(label)
         line += '[shape={0}]'.format(n.shape)
         line += '[fillcolor={0}]'.format(n.fillcolor)
         line += '[fontcolor={0}]'.format(n.fontcolor)
