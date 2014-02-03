@@ -29,7 +29,7 @@ Edges (connections between nodes, represented as arrows) can be:
 5. tag - project
 6. tags - tag
 
-The configuration options already are extensive but not fully developed.
+The configuration options are already extensive, but not fully developed.
 Configuration is done in `python3`, which is the language, dotwarrior is
 written in.
 
@@ -100,6 +100,10 @@ The option `byUrgency` is special. If it is set to `True`, the default colors
 for tasks are ignored. Instead, a color code is used for indicating the
 urgency of a task, which is calculated by taskwarrior.
 
+### layout
+The layout is one of the possible programs of the graphvis library, e.g.:
+dot, neato, circle, fdp, sfdp. Read `man dot` for more information.
+
 ### nodes
 which nodes shall be shown? `True` means show, `False` mean don't show.
 Self explanatory!
@@ -130,11 +134,9 @@ values should be greater than zero. Small values mean weak connections, large
 values lead to strong attraction.
 
 ### misc
-The layout is one of the possible programs of the graphvis library, e.g.:
-dot, neato, circle, fdp, sfdp, ...
-filename, penwidth, characters per line, ...
+penwidth, characters per line.
 
-### tagHierarchy
+### tag hierarchy
 Setting `conf.tagHierarchy` to some dictionary builds up a tag hierarchy.
 Entirely new tag symbols, which are not contained in your taskwarrior data,
 can be used.
