@@ -20,9 +20,17 @@ from extern import taskwarriorUrgency
 
 
 class Range(object):
+
     def __init__(self, minimum, maximum):
         self.min = minimum
         self.max = maximum
+
+    def push(self, val):
+        if val < self.min:
+            self.min = val
+        if val > self.max:
+            self.max = val
+
     def normalize(self, value):
         """
         normalize value, in such a way, that only
@@ -162,13 +170,17 @@ def nodes(conf, collections):
 
     def urgencyRange():
         urgs = {}
-        mx = -777
-        mn = 777
         for task in collections.tasks:
             urgs[task['uuid']] = taskwarriorUrgency(task['uuid'])
         mx = max(urgs.values())
         mn = min(urgs.values())
         return (Range(mn, mx), urgs)
+
+    def entryRange():
+        rng = Range(99999999, 00000000)
+        for task in collections.tasks:
+            rng.push(int(task['entry'][:8]))
+        return rng
 
     def project(p):
          return Ret(p, p,
@@ -207,6 +219,14 @@ def nodes(conf, collections):
         # r = '{0:1.2f}'.format(urg / maxUrg).split('.')[1]
         # color = '\"#{0}5555\"'.format(r)
         color = "\"{0:1.2f},0.99,0.59\"".format(0.5 - 0.5 * urgRange.normalize(urg))
+        return Ret(t['uuid'],
+                   t['description'],
+                   fillcolor=color,
+                   fontcolor='white',
+                   style='filled')
+
+    def entryTask(t, rng):
+        color = "\"{0:1.2f},0.99,0.59\"".format(0.6 * rng.normalize(int(t['entry'][:8])))
         return Ret(t['uuid'],
                    t['description'],
                    fillcolor=color,
@@ -261,6 +281,10 @@ def nodes(conf, collections):
             (maxUrgs, urgencies) = urgencyRange()
             for t in collections.tasks:
                 res.append(urgencyTask(t, urgencies[t['uuid']], maxUrgs))
+        elif conf.colors.byEntry:
+            rng = entryRange()
+            for t in collections.tasks:
+                res.append(entryTask(t, rng))
         else:
             for t in collections.tasks:
                 res.append(task(t))

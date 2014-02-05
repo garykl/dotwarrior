@@ -93,6 +93,13 @@ urgency.tagHierarchy = tagHierarchy
 urgency.nodes.annotations = False
 urgency.weights.task2tag = 2
 
+entry = Conf()
+entry.layout = 'neato'
+entry.colors.byEntry = True
+entry.excluded.tags = ['MPI']
+entry.tagHierarchy = tagHierarchy
+entry.nodes.annotations = False
+entry.weights.task2tag = 2
 
 configs = {'tag': tagWeight,
            'nt': notasks,
@@ -100,6 +107,7 @@ configs = {'tag': tagWeight,
            'few': fewProjects,
            'one': oneProject,
            'urg': urgency,
+           'ent': entry,
            'df': default,
            '': mydefault,
            'np': noprojects}

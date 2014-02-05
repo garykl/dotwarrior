@@ -36,6 +36,7 @@ class Colors(object):
         self.other = 'white'
         self.fontDefault = 'black'
         self.byUrgency = False
+        self.byEntry = False
 
 ## what is a node?
 class Nodes(object):
