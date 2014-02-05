@@ -280,9 +280,10 @@ def dotsource(conf, nodes, connections):
     HEADER = "digraph  dependencies {"
     HEADER += "layout={0}; ".format(conf.layout)
     HEADER += "splines=true; "
-    HEADER += "overlap=scalexy; "
-    HEADER += "rankdir=LR;"
-    HEADER += "weight=2;"
+    # HEADER += "overlap=false; "
+    # HEADER += "overlap_scaling=0.1;"
+    # HEADER += "rankdir=TB;"
+    # HEADER += "weight=2;"
     FOOTER = "}"
 
     def node(n):
@@ -296,6 +297,7 @@ def dotsource(conf, nodes, connections):
         line += '[shape={0}]'.format(n.shape)
         line += '[fillcolor={0}]'.format(n.fillcolor)
         line += '[fontcolor={0}]'.format(n.fontcolor)
+        line += '[fontsize=10]'
         line += '[style={0}]'.format(n.style)
         line += '[penwidth={0}]'.format(n.penwidth)
         return line
@@ -305,6 +307,7 @@ def dotsource(conf, nodes, connections):
         line = '"{0}" -> "{1}"'.format(con.id1, con.id2)
         line += '[style={0}]'.format(con.style)
         line += '[color={0}]'.format(con.color)
+        line += '[len=2]'
         line += '[weight={0}]'.format(con.weight)
         return line
 

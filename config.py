@@ -86,12 +86,12 @@ tagtag.nodes.annotations = False
 tagtag.weights.task2tag = 20
 
 urgency = Conf()
-urgency.layout = 'dot'
+urgency.layout = 'neato'
 urgency.colors.byUrgency = True
 urgency.excluded.tags = ['MPI']
 urgency.tagHierarchy = tagHierarchy
 urgency.nodes.annotations = False
-urgency.weights.task2tag = 20
+urgency.weights.task2tag = 2
 
 
 configs = {'tag': tagWeight,

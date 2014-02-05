@@ -61,13 +61,13 @@ class Excluded(object):
 ## edges weight
 class Weights(object):
     def __init__(self):
-        self.task2task = 31
-        self.task2tag  = 1
-        self.task2project = 5
-        self.task2annotation = 99
-        self.project2tag = 10
-        self.tag2tag = 10
-        self.tagHierarchy = 20
+        self.task2task = 0.3
+        self.task2tag  = 0.1
+        self.task2project = 0.1
+        self.task2annotation = 0.9
+        self.project2tag = 0.1
+        self.tag2tag = 0.1
+        self.tagHierarchy = 0.2
 
 
 class Conf(object):
