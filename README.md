@@ -100,9 +100,12 @@ The option `byUrgency` is special. If it is set to `True`, the default colors
 for tasks are ignored. Instead, a color code is used for indicating the
 urgency of a task, which is calculated by taskwarrior.
 
+If option `byEntry` is set and `byUrgency` is not set, the task nodes are
+colored by the date when they were created.
+
 ### layout
 The layout is one of the possible programs of the graphvis library, e.g.:
-dot, neato, circle, fdp, sfdp. Read `man dot` for more information.
+dot, neato, circo, fdp, sfdp. Read `man dot` for more information.
 
 ### nodes
 which nodes shall be shown? `True` means show, `False` mean don't show.
@@ -123,10 +126,17 @@ You can also set `conf.edges.projectVStags = True`, which, again, is only useful
 drawn when a task in a project has that tag.
 
 ### excluded
-- `conf.excluded.tags = [] # those tags are supressed`
-- `conf.excluded.taskStatus = ['deleted'] # deleted tasks are not shown`
-- `conf.excluded.taggedTaskStatus = set(['deleted']) # deleted tasks are not connected to tags`
-- `conf.excluded.annotationStatus = ['deleted', 'completed'] # deleted and completed tasks annotations are not shown`
+those tags are supressed:
+`conf.excluded.tags = []`
+
+deleted tasks are not shown:
+`conf.excluded.taskStatus = ['deleted']`
+
+deleted tasks are not connected to tags:
+`conf.excluded.taggedTaskStatus = set(['deleted'])`
+
+deleted and completed tasks annotations are not shown:
+`conf.excluded.annotationStatus = ['deleted', 'completed']`
 
 ### weights
 how strong are the different kinds of nodes connected by their edges?
