@@ -270,7 +270,7 @@ def nodes(conf, collections):
             prefix = ''
             color = conf.colors.other
 
-        return Ret(t['uuid'], '{0}: {1}'.format(prefix, label),
+        return Ret(t['uuid'], '{0}: {1}'.format(prefix, t['description']),
                    shape='box',
                    fillcolor=color,
                    style=style)
