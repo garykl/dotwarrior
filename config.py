@@ -94,12 +94,11 @@ urgency.nodes.annotations = False
 urgency.weights.task2tag = 2
 
 entry = Conf()
-entry.layout = 'neato'
+entry.layout = 'fdp'
 entry.colors.byEntry = True
 entry.excluded.tags = ['MPI']
 entry.tagHierarchy = tagHierarchy
-entry.nodes.annotations = False
-entry.weights.task2tag = 2
+entry.nodes.annotations = True
 
 configs = {'tag': tagWeight,
            'nt': notasks,

@@ -18,6 +18,16 @@
 import textwrap
 from extern import taskwarriorUrgency
 
+def entry2number(valString):
+    """
+    take some date string in the format yyyymmdd and
+    convert it into a metrix scale.
+    """
+    yr = valString[:4]
+    mt = valString[4:6]
+    dy = valString[6:]
+    val = int(yr) * 365 + int(mt) * 30 + int(dy)
+    return val
 
 class Range(object):
 
@@ -179,7 +189,8 @@ def nodes(conf, collections):
     def entryRange():
         rng = Range(99999999, 00000000)
         for task in collections.tasks:
-            rng.push(int(task['entry'][:8]))
+            val = entry2number(task['entry'][:8])
+            rng.push(val)
         return rng
 
     def project(p):
@@ -226,7 +237,7 @@ def nodes(conf, collections):
                    style='filled')
 
     def entryTask(t, rng):
-        color = "\"{0:1.2f},0.99,0.59\"".format(0.6 * rng.normalize(int(t['entry'][:8])))
+        color = "\"{0:1.2f},0.99,0.59\"".format(0.6 * rng.normalize(entry2number(t['entry'][:8])))
         return Ret(t['uuid'],
                    t['description'],
                    fillcolor=color,
