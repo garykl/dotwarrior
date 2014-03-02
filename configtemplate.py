@@ -17,7 +17,7 @@
 
 class Miscs(object):
     def __init__(self):
-        self.charsPerLine = 20;
+        self.charsPerLine = 25;
         self.penwidth = 1
 
 # colors
@@ -55,6 +55,7 @@ class Edges(object):
 class Excluded(object):
     def __init__(self):
         self.tags = [] # those nodes are supressed
+        self.projects = []
         self.taskStatus = ['deleted'] # nodes removed
         self.taggedTaskStatus = set(['deleted']) # connection between tags and those are supressed
         self.annotationStatus = ['deleted', 'completed']
@@ -67,6 +68,7 @@ class Weights(object):
         self.task2project = 0.1
         self.task2annotation = 0.9
         self.project2tag = 0.1
+        self.project2project = 0.5
         self.tag2tag = 0.1
         self.tagHierarchy = 0.2
 

@@ -17,57 +17,40 @@
 
 from configtemplate import Conf
 
-tagHierarchy = {'topic': ['swimmer', 'dissipation', 'flowfield', 'multipole'],
+tagHierarchy = {'topic': ['swimmer', 'fluctuation', 'dissipation', 'flowfield', 'multipole'],
                 'multipole': ['dipole', 'quadrupole', 'octupole'],
                 'action': ['implement', 'maintain', 'plot', 'test',
-                'analyse', 'decide', 'consider'],
+                'analyse', 'bugfix', 'decide', 'consider', 'ask', 'answer'],
                 'who': ['janine', 'alex', 'thomas']}
 
 default = Conf()
 
-mydefault = Conf()
-mydefault.layout = 'neato' # circo seems to be slow, but stable
-mydefault.excluded.tags = ['program']
-mydefault.excluded.taggedTaskStatus = ['deleted', 'completed']
-mydefault.excluded.taskStatus = ['deleted', 'completed']
-mydefault.excluded.annotationStatus = ['completed']
-
-tagWeight = Conf()
-tagWeight.layout = 'neato'
-tagWeight.excluded.taskStatus = ['deleted', 'completed']
-tagWeight.excluded.taggedTaskStatus = ['deleted', 'completed']
-tagWeight.excluded.tags = ['MPI']
-tagWeight.nodes.projects = False
-tagWeight.nodes.annotations = True
-tagWeight.weights.task2tag = 70
-
-fewProjects = Conf()
-fewProjects.layout = 'neato'
-fewProjects.excluded.taskStatus = ['deleted', 'completed']
-fewProjects.excluded.taggedTaskStatus = ['deleted', 'completed']
-fewProjects.excluded.tags = ['MPI']
-fewProjects.nodes.projects = True
-fewProjects.nodes.annotations = True
-fewProjects.weights.task2tag = 20
+oneTag = Conf()
+oneTag.layout = 'fdp'
+oneTag.colors.byEntry = True
+oneTag.nodes.projects = True
+oneTag.nodes.annotations = True
 
 oneProject = Conf()
 oneProject.layout = 'neato'
-oneProject.excluded.taskStatus = ['deleted', 'completed']
-oneProject.excluded.taggedTaskStatus = ['deleted', 'completed']
-oneProject.excluded.tags = ['MPI']
+oneProject.colors.byEntry = True
 oneProject.nodes.projects = False
 oneProject.nodes.annotations = True
-oneProject.weights.task2tag = 20
+oneProject.tagHierarchy = tagHierarchy
 
-noprojects = Conf()
-noprojects.layout = 'neato'
-noprojects.nodes.projects = False
-noprojects.excluded.tags = ['program']
-noprojects.nodes.annotations = False
-noprojects.weights.task2tag = 20
+oneBigProject = Conf()
+oneBigProject.layout = 'fdp'
+oneBigProject.colors.byEntry = True
+oneBigProject.nodes.projects = True
+oneBigProject.nodes.annotations = True
+# oneBigProject.tagHierarchy = tagHierarchy
+oneBigProject.excluded.projects = ['phd']
+oneBigProject.weights.project2tag = 0.00001
+oneBigProject.weights.tag2tag = 0.1
+oneBigProject.weights.task2tag = 0.1
 
 notasks = Conf()
-notasks.layout = 'neato'
+notasks.layout = 'fdp'
 notasks.nodes.tasks = False
 notasks.nodes.annotations = False
 notasks.edges.projectVStags = True
@@ -76,19 +59,19 @@ notasks.nodes.annotations = False
 notasks.weights.task2tag = 20
 
 tagtag = Conf()
-tagtag.layout = 'neato'
+tagtag.layout = 'fdp'
 tagtag.nodes.tasks = False
 tagtag.nodes.projects = False
 tagtag.nodes.annotations = False
 tagtag.edges.tagVStags = True
 tagtag.excluded.tags = []
 tagtag.nodes.annotations = False
+tagtag.tagHierarchy = tagHierarchy
 tagtag.weights.task2tag = 20
 
 urgency = Conf()
-urgency.layout = 'neato'
+urgency.layout = 'fdp'
 urgency.colors.byUrgency = True
-urgency.excluded.tags = ['MPI']
 urgency.tagHierarchy = tagHierarchy
 urgency.nodes.annotations = False
 urgency.weights.task2tag = 2
@@ -96,18 +79,15 @@ urgency.weights.task2tag = 2
 entry = Conf()
 entry.layout = 'fdp'
 entry.colors.byEntry = True
-entry.excluded.tags = ['MPI']
 entry.tagHierarchy = tagHierarchy
 entry.nodes.annotations = True
 
-configs = {'tag': tagWeight,
-           'nt': notasks,
+configs = {'nt': notasks,
            'tt': tagtag,
-           'few': fewProjects,
-           'one': oneProject,
+           'project': oneProject,
+           'bigproject': oneBigProject,
+           'tag': oneTag,
            'urg': urgency,
-           'ent': entry,
-           'df': default,
-           '': mydefault,
-           'np': noprojects}
+           '': entry,
+           'df': default }
 

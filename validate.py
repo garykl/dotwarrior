@@ -21,7 +21,7 @@ class TaskwarriorExploit(object):
 
     def __init__(self, tasks, excluded):
         self.tasks = tasks
-        self.projects = self.projects()
+        self.projects = excludeElementsFrom(excluded.projects, self.projects())
         self.tags = excludeElementsFrom(excluded.tags, self.tags())
         self.uuids = self.uuids()
         self.annotations = self.annotations(excluded.annotationStatus)

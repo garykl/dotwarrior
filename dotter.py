@@ -46,7 +46,12 @@ class Range(object):
         normalize value, in such a way, that only
         values between 0 and 1 are returned.
         """
-        return (value - self.min) / (self.max - self.min)
+        d = self.max - self.min
+        if d < 0.000001:
+            res = 0.5
+        else:
+            res = (value - self.min) / d
+        return res
 
 
 def connector(conf, collections):
@@ -85,8 +90,13 @@ def connector(conf, collections):
         res = []
         if task['description']:
             if 'project' in task.keys():
-                if not task['status'] in excludedTaskStatus:
-                    res.append(Ret(task['uuid'], task['project'], 'bold', 'blue', conf.weights.task2project))
+                if task['project'] in collections.projects:
+                    if not task['status'] in excludedTaskStatus:
+                        res.append(Ret(task['uuid'],
+                                       task['project'],
+                                       'bold',
+                                       'blue',
+                                       conf.weights.task2project))
         return res
 
     def taskVSannotations(task):
@@ -128,6 +138,24 @@ def connector(conf, collections):
                                        conf.weights.tag2tag))
         return res
 
+    def projectVSprojects():
+        """
+        let's support subprojects.
+        """
+        res = []
+        for p1 in collections.projects:
+            for p2 in collections.projects:
+                cond = p1 in p2 and p1 != p2
+                cond = cond and p1 not in conf.excluded.projects
+                cond = cond and p2 not in conf.excluded.projects
+                if cond:
+                    res.append(Ret(p2,
+                                   p1,
+                                   'solid',
+                                   '"#554411"',
+                                   conf.weights.project2project))
+        return res
+
     def tagHierarchy(tagHierarchy, tags):
         res = []
         hitags = tagHierarchy.keys()
@@ -143,6 +171,8 @@ def connector(conf, collections):
 
 
     res = []
+    if conf.nodes.projects:
+        res = res + projectVSprojects()
     for t in collections.tasks:
         if conf.nodes.tasks:
             res = res + taskVStask(t, collections.uuids)
@@ -300,7 +330,8 @@ def nodes(conf, collections):
             for t in collections.tasks:
                 res.append(task(t))
     if conf.nodes.projects:
-        res = res + list(map(project, collections.projects))
+        res = res + list(map(project,
+            filter(lambda p: p not in conf.excluded.projects, collections.projects)))
     if conf.nodes.tags:
         res = res + list(map(tag, collections.tags))
     if conf.nodes.annotations:
