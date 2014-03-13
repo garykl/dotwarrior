@@ -42,9 +42,15 @@ def prog(conf, tasks):
     return dotSource
 
 
-(filename, confKey) = interpreteInput(sys.argv[1:])
+inp = interpreteInput(sys.argv[1:])
+filename = inp['filename']
+confKey = inp['conf']
+tagExclude = inp['notags']
+
+conf = configs[confKey]
+conf.excluded.tags += tagExclude
+
 
 tasks = taskwarriorJSON()
-conf = configs[confKey]
 dotSource = prog(conf, tasks)
 dot(conf, dotSource, filename)

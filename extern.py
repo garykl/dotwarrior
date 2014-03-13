@@ -45,8 +45,12 @@ def interpreteInput(args):
     """
     def isConf(a):
         return '--' in a
+    def isTagExclude(a):
+        return '-' in a
     (confOptions, otherOptions) = splitList(isConf, args)
     confKeys = list(map(lambda x: x[2:], confOptions))
+    (excludeTagsOptions, otherOptions) = splitList(isTagExclude, otherOptions)
+    excludeTagsOptions = list(map(lambda x: x[1:], excludeTagsOptions))
     if len(otherOptions) == 0:
         filename = 'dotwarrior'
     else:
@@ -54,7 +58,9 @@ def interpreteInput(args):
     if len(confKeys) == 0:
         confKeys = ['']
 
-    return (filename, confKeys[0])
+    return {'filename': filename,
+            'conf': confKeys[0],
+            'notags': excludeTagsOptions}
 
 
 def taskwarrior(cmd):

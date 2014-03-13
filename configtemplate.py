@@ -66,7 +66,7 @@ class Weights(object):
         self.task2task = 0.3
         self.task2tag  = 0.1
         self.task2project = 0.1
-        self.task2annotation = 0.9
+        self.task2annotation = 9
         self.project2tag = 0.1
         self.project2project = 0.5
         self.tag2tag = 0.1
