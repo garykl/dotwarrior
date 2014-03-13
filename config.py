@@ -30,6 +30,7 @@ oneTag.layout = 'fdp'
 oneTag.colors.byEntry = True
 oneTag.nodes.projects = True
 oneTag.nodes.annotations = True
+oneTag.excluded.tags = []
 
 oneProject = Conf()
 oneProject.layout = 'neato'

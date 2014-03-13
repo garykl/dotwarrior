@@ -58,7 +58,7 @@ class Excluded(object):
         self.projects = []
         self.taskStatus = ['deleted'] # nodes removed
         self.taggedTaskStatus = set(['deleted']) # connection between tags and those are supressed
-        self.annotationStatus = ['deleted', 'completed']
+        self.annotationStatus = ['deleted']
 
 ## edges weight
 class Weights(object):

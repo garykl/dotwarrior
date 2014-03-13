@@ -58,5 +58,9 @@ class TaskwarriorExploit(object):
         for task in self.tasks:
             if 'annotations' in task and task['status'] not in excludedAnnotationStatus:
                 for a in task['annotations']:
+                    if 'Started task' in a['description']:
+                        continue
+                    if 'Stopped task' in a['description']:
+                        continue
                     res.append(Annotation(a['entry'], a['description']))
         return res

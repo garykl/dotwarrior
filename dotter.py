@@ -104,6 +104,10 @@ def connector(conf, collections):
         if task['status'] not in conf.excluded.annotationStatus:
             if 'annotations' in task:
                 for a in task['annotations']:
+                    if 'Started task' in a['description']:
+                        continue
+                    if 'Stopped task' in a['description']:
+                        continue
                     res.append(Ret(a['entry'],
                                    task['uuid'],
                                    'solid',
@@ -346,7 +350,7 @@ def dotsource(conf, nodes, connections):
     HEADER = "digraph  dependencies {"
     HEADER += "layout={0}; ".format(conf.layout)
     HEADER += "splines=true; "
-    # HEADER += "overlap=false; "
+    HEADER += "overlap=false; "
     # HEADER += "overlap_scaling=0.1;"
     # HEADER += "rankdir=TB;"
     # HEADER += "weight=2;"
