@@ -10,6 +10,29 @@ def excludeElementsFrom(toExclude, ll):
             res.append(l)
     return res
 
+def isTimed(task):
+    """
+    return time for task that is timed via task id start/stop.
+    time is zero when it is not stopped.
+    """
+    def timeFromStamps(start, stop):
+        if start[:8] != stop[:8]:
+            return 0
+        else:
+            return int(stop[9:15]) - int(start[9:15])
+
+    starts = []
+    stops = []
+    time = 0
+    if 'annotations' in task:
+        for a in task['annotations']:
+            if 'Started task' in a['description']:
+                starts.append(a['entry'])
+            if 'Stopped task' in a['description']:
+                stops.append(a['entry'])
+    for (start, stop) in zip(starts, stops):
+        time += timeFromStamps(start, stop)
+
 
 class Annotation(object):
     def __init__(self, entry, description):
