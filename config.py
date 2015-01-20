@@ -40,7 +40,7 @@ oneProject.nodes.annotations = True
 oneProject.tagHierarchy = tagHierarchy
 
 oneBigProject = Conf()
-oneBigProject.layout = 'fdp'
+oneBigProject.layout = 'neato'
 oneBigProject.colors.byEntry = True
 oneBigProject.nodes.projects = True
 oneBigProject.nodes.annotations = True

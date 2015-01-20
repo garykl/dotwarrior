@@ -367,7 +367,7 @@ def dotsource(conf, nodes, connections):
         line += '[shape={0}]'.format(n.shape)
         line += '[fillcolor={0}]'.format(n.fillcolor)
         line += '[fontcolor={0}]'.format(n.fontcolor)
-        line += '[fontsize=10]'
+        line += '[fontsize=20]'
         line += '[style={0}]'.format(n.style)
         line += '[penwidth={0}]'.format(n.penwidth)
         return line
@@ -377,7 +377,7 @@ def dotsource(conf, nodes, connections):
         line = '"{0}" -> "{1}"'.format(con.id1, con.id2)
         line += '[style={0}]'.format(con.style)
         line += '[color={0}]'.format(con.color)
-        line += '[len=2]'
+        line += '[len=0.2]'
         line += '[weight={0}]'.format(con.weight)
         return line
 
