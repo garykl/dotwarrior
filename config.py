@@ -17,11 +17,11 @@
 
 from configtemplate import Conf
 
-tagHierarchy = {'topic': ['swimmer', 'fluctuation', 'dissipation', 'flowfield', 'multipole'],
-                'multipole': ['dipole', 'quadrupole', 'octupole'],
-                'action': ['implement', 'maintain', 'plot', 'test',
-                'analyse', 'bugfix', 'decide', 'consider', 'ask', 'answer'],
-                'who': ['janine', 'alex', 'thomas']}
+tagHierarchy = {}#'topic': ['swimmer', 'fluctuation', 'dissipation', 'flowfield', 'multipole'],
+                # 'multipole': ['dipole', 'quadrupole', 'octupole'],
+                # 'action': ['implement', 'maintain', 'plot', 'test',
+                # 'analyse', 'bugfix', 'decide', 'consider', 'ask', 'answer'],
+                # 'who': ['janine', 'alex', 'thomas']}
 
 default = Conf()
 
