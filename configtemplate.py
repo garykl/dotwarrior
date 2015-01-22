@@ -75,7 +75,7 @@ class Weights(object):
 
 class Conf(object):
     def __init__(self):
-        self.layout = "twopi"
+        self.layout = "fdp"
         self.colors = Colors()
         self.weights = Weights()
         self.misc = Miscs()
