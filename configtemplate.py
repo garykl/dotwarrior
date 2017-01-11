@@ -1,4 +1,4 @@
-# Copright 2014 Gary Klindt
+# Copright 2014-2017 Gary Klindt
 #
 # This file is part of dotwarrior.
 #

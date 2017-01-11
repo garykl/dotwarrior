@@ -350,7 +350,7 @@ def dotsource(conf, nodes, connections):
     HEADER = "digraph  dependencies {"
     HEADER += "layout={0}; ".format(conf.layout)
     HEADER += "splines=true; "
-    HEADER += "overlap=false; "
+    # HEADER += "overlap=false; "
     # HEADER += "overlap_scaling=0.1;"
     # HEADER += "rankdir=TB;"
     # HEADER += "weight=2;"

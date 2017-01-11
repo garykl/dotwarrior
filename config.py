@@ -91,4 +91,3 @@ configs = {'nt': notasks,
            'urg': urgency,
            '': entry,
            'df': default }
-

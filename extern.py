@@ -74,7 +74,7 @@ def taskwarriorJSON():
     read input from taskwarrior via stdin,
     return list of dictionaries.
     """
-    taskwarrioroutput = sys.stdin.read()
+    taskwarrioroutput = ','.join(sys.stdin.readlines())
     return json.loads('[' + taskwarrioroutput + "]")
 
 def taskwarriorUrgency(uuid):
@@ -98,5 +98,3 @@ def dot(conf, instruction, filename):
         with open('{0}.svg'.format(filename), 'w') as f:
             f.write(png.decode('utf-8'))
             print(svgViewer + " " + filename + ".svg &")
-
-
