@@ -1,9 +1,9 @@
-# dotwarrior
+* dotwarrior
 
 dotwarrior creates meaningful bullet lists in graph appearance.
 
-Using the output of `taskwarrior export`, nice visualizations using
-`graphviz` are produced. If you don't use taskwarrior, this program
+Using the output of =taskwarrior export=, nice visualizations using
+=graphviz= are produced. If you don't use taskwarrior, this program
 won't make any sense to you, except you want to learn using it, which
 could point out to be useful.
 
@@ -30,17 +30,19 @@ Edges (connections between nodes, represented as arrows) can be:
 6. tags - tag
 
 The configuration options are already extensive, but not fully developed.
-Configuration is done in `python3`, which is the language, dotwarrior is
+Configuration is done in =python3=, which is the language, dotwarrior is
 written in.
 
-## usage
+** usage
 
 Dotwarrior is called as follows, if it is executable (file permission) and
 in a folder inside the $PATH variable:
 
-    $> taskwarrior export | dotwarrior.py out
-    $> taskwarrior export project:presentation | dotwarrior.py presi
-    $> taskwarrior export +work | dotwarrior.py constr
+#+BEGIN_SRC sh
+$> taskwarrior export | dotwarrior.py out
+$> taskwarrior export project:presentation | dotwarrior.py presi
+$> taskwarrior export +work | dotwarrior.py constr
+#+END_SRC
 
 An argument without a dash is interpeted as filename, which means, we just
 created three files out.svg, presi.svg and constr.svg. More possible
@@ -52,102 +54,102 @@ the full power of taskwarrior is conserved as it is.
 
 dotwarrior is only useful, if you fine tune your own configurations. An
 arbitrary number of configurations can be created (it is an instance of the
-configuration class `Conf`) and then be used by specifying command line options.
+configuration class =Conf=) and then be used by specifying command line options.
 See also section configuration/command line options.
 
-## configuration
+** configuration
 
-Configuration is done in `python3`.
+Configuration is done in =python3=.
 
 One or more configuration objects (configtemplate.Conf) are instantiated, one
 of them is dynamically chosen at run-time through configurable command
 line arguments (see section configuration/command line options).
 
-Several example configurations are given in `config.py`.
+Several example configurations are given in =config.py=.
 
 The following paragraphs provide an overview over the planned and partly
 realized configuration options. It's probably
-a good idea to read `configtemplate.py` in parallel to the following.
+a good idea to read =configtemplate.py= in parallel to the following.
 
-For the following subsections, assume that there is an object
+For the following subsections, assume that there is an object =conf = Conf()=
 
-    conf = Conf()
-
-### colors
+*** colors
 different colors for different status of tasks can be / are set, like
 completed, pending, deleted or being a tag or a project. The following options
 are available, and its default values are shown. It is hopwfully self
 explanatory.
 
-- `conf.colors.project = 'white'`
-- `conf.colors.annotation = 'yellow'`
-- `conf.colors.blocked = 'green'`
-- `conf.colors.unblocked = 'lightgreen'`
-- `conf.colors.done = 'grey'`
-- `conf.colors.wait = 'white'`
-- `conf.colors.deleted = 'pink'`
-- `conf.colors.tag = 'white'`
-- `conf.colors.fillTag = 'black'`
-- `conf.colors.fontTag = 'white'`
-- `conf.colors.other = 'white'`
-- `conf.colors.fontDefault = 'black'`
-- `conf.colors.byUrgency = False`
+#+BEGIN_SRC python
+conf.colors.project = 'white'
+conf.colors.annotation = 'yellow'
+conf.colors.blocked = 'green'
+conf.colors.unblocked = 'lightgreen'
+conf.colors.done = 'grey'
+conf.colors.wait = 'white'
+conf.colors.deleted = 'pink'
+conf.colors.tag = 'white'
+conf.colors.fillTag = 'black'
+conf.colors.fontTag = 'white'
+conf.colors.other = 'white'
+conf.colors.fontDefault = 'black'
+conf.colors.byUrgency = False
+#+END_SRC
 
 Colors can also be HSV codes ('h,s,v', h, s and v being numbers between 0 and 1)
-and RGB as hex code (e.g. '#00ff33').
+and RGB as hex code (e.g. '=#00ff33=').
 
-The option `byUrgency` is special. If it is set to `True`, the default colors
+The option =byUrgency= is special. If it is set to =True=, the default colors
 for tasks are ignored. Instead, a color code is used for indicating the
 urgency of a task, which is calculated by taskwarrior.
 
-If option `byEntry` is set and `byUrgency` is not set, the task nodes are
+If option =byEntry= is set and =byUrgency= is not set, the task nodes are
 colored by the date when they were created.
 
-### layout
+*** layout
 The layout is one of the possible programs of the graphvis library, e.g.:
-dot, neato, circo, fdp, sfdp. Read `man dot` for more information.
+dot, neato, circo, fdp, sfdp. Read =man dot= for more information.
 
-### nodes
-which nodes shall be shown? `True` means show, `False` mean don't show.
+*** nodes
+which nodes shall be shown? =True= means show, =False= mean don't show.
 Self explanatory!
 
-### edges
+*** edges
 One can choose to show edges between certain tags by setting
-`conf.edges.tagVStags = True`. This is only useful, when setting
-`conf.nodes.tasks = False`, because the connections between different tags
+=conf.edges.tagVStags = True=. This is only useful, when setting
+=conf.nodes.tasks = False=, because the connections between different tags
 are set, when one task has multiple tags. It shows
 you information about your working style, like what kind of stuff are you doing
 when working at certain places or with certain persons, or what are you really
 doing when working on certain topics. This option is only
 useful if you use tags extensively!
 
-You can also set `conf.edges.projectVStags = True`, which, again, is only useful when
-`conf.nodes.tasks = False`, since connection between a project and a tag is
+You can also set =conf.edges.projectVStags = True=, which, again, is only useful when
+=conf.nodes.tasks = False=, since connection between a project and a tag is
 drawn when a task in a project has that tag.
 
-### excluded
+*** excluded
 those tags are supressed:
-`conf.excluded.tags = []`
+=conf.excluded.tags = []=
 
 deleted tasks are not shown:
-`conf.excluded.taskStatus = ['deleted']`
+=conf.excluded.taskStatus = ['deleted']=
 
 deleted tasks are not connected to tags:
-`conf.excluded.taggedTaskStatus = set(['deleted'])`
+=conf.excluded.taggedTaskStatus = set(['deleted'])=
 
 deleted and completed tasks annotations are not shown:
-`conf.excluded.annotationStatus = ['deleted', 'completed']`
+=conf.excluded.annotationStatus = ['deleted', 'completed']=
 
-### weights
+*** weights
 how strong are the different kinds of nodes connected by their edges?
 values should be greater than zero. Small values mean weak connections, large
 values lead to strong attraction.
 
-### misc
+*** misc
 penwidth, characters per line.
 
-### tag hierarchy
-Setting `conf.tagHierarchy` to some dictionary builds up a tag hierarchy.
+*** tag hierarchy
+Setting =conf.tagHierarchy= to some dictionary builds up a tag hierarchy.
 Entirely new tag symbols, which are not contained in your taskwarrior data,
 can be used.
 
@@ -162,23 +164,41 @@ for having a better alignment relativ to certain actions or places, ...
 
 This, again, is only useful when using tags extensively.
 
-### command line options
-The keys in `configs` can be used as command line options by prefixing `--`.
-If such an option is given, the corresponding value of `configs` is used.
+*** command line options
+The keys in =configs= can be used as command line options by prefixing =--=.
+If such an option is given, the corresponding value of =configs= is used.
 
     task project:dotwarrior status:pending export | dotwarrior.py --urg out
 
 creates a graph that is color coded by urgency, that means urgent tasks that
 should be done at first are colored in red, whereas more unimportant tasks
-are blue. It is saved in `out.svg`.
+are blue. It is saved in =out.svg=.
 
-## examples
+** examples
 
-The file `config.py` contains many examples of configurations described above.
-Default values can be found in `configtemplate.py`.
+The file =config.py= contains many examples of configurations described above.
+Default values can be found in =configtemplate.py=.
 
-## How could I
+** How could I
 
 This project was a spontaneous effect, build out of
 [graphdeps](http://pastebin.com/9EyvEL0M/ "Graphdeps"), after finding
 the inspiring taskwarrior.
+
+** future direction
+
+   This program should be split apart into two programs. One of which
+   transforms the data inside taskwarrior into a network with
+   different node types and different edge types. The other one takes
+   a graph with different node and edge types into a directed graph
+   with optical attributes.
+
+*** TODO implement conversion to intermediate data structure
+
+    Typed network. The types are just different numbers, e.g. project
+    is 1, tag is 2, description is 3, ...  project2project is 1,
+    description2tag is 2, and so on.
+
+*** TODO implement to configuration engine
+
+    Each type is assigned a set of graphviz settings.
