@@ -1,3 +1,6 @@
+This program is *deprecated*. A rigorous rewrite can be found at
+[[https://github.com/garykl/task2dot]].
+
 * dotwarrior
 
 dotwarrior creates meaningful bullet lists in graph appearance.
